@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Git Secrets Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🕵️ Git Secrets Playground</h1>
+    <p class="subtitle">.gitディレクトリーの構造と漏洩リスクをシミュレーションで学ぼう</p>
+    <nav class="tab-nav">
+      <button class="tab-button active" data-tab="structure">構造ビューアー</button>
+      <button class="tab-button" data-tab="objects">オブジェクト復元</button>
+      <button class="tab-button" data-tab="leak">リーク検査</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 構造ビューア -->
+    <section id="structure" class="tab-content active">
+      <h2>📁 .git構造ビューアー</h2>
+      <p>.gitフォルダーの中身をツリー表示し、それぞれの意味とリスクを可視化します。</p>
+      <div id="structure-viewer">
+        <!-- ツリー構造がここに生成される -->
+      </div>
+    </section>
+
+    <!-- オブジェクト復元 -->
+    <section id="objects" class="tab-content">
+      <h2>🔍 Gitオブジェクト復元</h2>
+      <p>SHA-1ハッシュを入力して、Gitオブジェクト（blob / tree / commit）を復元します。</p>
+      <input type="text" id="object-hash" placeholder="例: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
+      <button id="recover-object">復元</button>
+      <pre id="object-output"></pre>
+    </section>
+
+    <!-- リーク検査 -->
+    <section id="leak" class="tab-content">
+      <h2>🚨 .gitリーク検査（シミュレーション）</h2>
+      <p>特定のURLに `.git/HEAD` などが存在した場合、どのように情報が辿られるかを再現します。</p>
+      <input type="text" id="target-url" placeholder="https://example.com/.git/HEAD">
+      <button id="simulate-leak">シミュレート</button>
+      <div id="leak-result">
+        <!-- シミュレーション結果表示 -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer">
+      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/git-secrets-playground" target="_blank">ipusiron/git-secrets-playground</a> ）
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

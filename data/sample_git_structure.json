@@ -1,0 +1,15 @@
+{
+  "name": ".git",
+  "type": "folder",
+  "children": [
+    { "name": "HEAD", "type": "file", "risk": "high" },
+    { "name": "config", "type": "file", "risk": "medium" },
+    {
+      "name": "objects",
+      "type": "folder",
+      "children": [
+        { "name": "e6/9de29b...", "type": "file", "risk": "high" }
+      ]
+    }
+  ]
+}
