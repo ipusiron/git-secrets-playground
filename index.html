@@ -8,12 +8,19 @@
 </head>
 <body>
   <header>
-    <h1>🕵️ Git Secrets Playground</h1>
-    <p class="subtitle">.gitディレクトリーの構造と漏洩リスクをシミュレーションで学ぼう</p>
+    <div class="header-content">
+      <div class="title-section">
+        <h1>🕵️ Git Secrets Playground</h1>
+        <button id="help-button" class="help-button" title="ヘルプを表示">❓</button>
+      </div>
+      <p class="subtitle">.gitディレクトリーの構造と漏洩リスクをシミュレーションで学ぼう</p>
+    </div>
     <nav class="tab-nav">
       <button class="tab-button active" data-tab="structure">構造ビューアー</button>
       <button class="tab-button" data-tab="objects">オブジェクト復元</button>
       <button class="tab-button" data-tab="leak">リーク検査</button>
+      <button class="tab-button" data-tab="compare">構造比較</button>
+      <button class="tab-button" data-tab="ctf">CTFヒント</button>
     </nav>
   </header>
 
@@ -22,15 +29,45 @@
     <section id="structure" class="tab-content active">
       <h2>📁 .git構造ビューアー</h2>
       <p>.gitフォルダーの中身をツリー表示し、それぞれの意味とリスクを可視化します。</p>
+      <div id="statistics-panel"></div>
       <div id="git-tree"></div>
     </section>
 
     <!-- オブジェクト復元 -->
     <section id="objects" class="tab-content">
-      <h2>🔍 Gitオブジェクト復元</h2>
+      <h2>🔍 Gitオブジェクト復元（シミュレーション）</h2>
       <p>SHA-1ハッシュを入力して、Gitオブジェクト（blob / tree / commit）を復元します。</p>
-      <input type="text" id="object-hash" placeholder="例: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
-      <button id="recover-object">復元</button>
+      
+      <div class="simulator-notice">
+        <h3>🎯 シミュレーター説明</h3>
+        <p><strong>このツールはシミュレーターです。</strong> 以下の4種類のサンプルハッシュのみが正しい情報を返します：</p>
+        <div class="sample-buttons">
+          <button class="sample-button" onclick="setSampleHash('e69de29bb2d1d6434b8b29ae775ad8c2e48c5391')">
+            📄 空ファイル<br><span class="hash-preview">e69de29b...</span>
+          </button>
+          <button class="sample-button" onclick="setSampleHash('557db03de997c86a4a028e1ebd3a1ceb225be238')">
+            📝 テキストファイル<br><span class="hash-preview">557db03d...</span>
+          </button>
+          <button class="sample-button" onclick="setSampleHash('4b825dc642cb6eb9a060e54bf8d69288fbee4904')">
+            ⚠️ 機密設定ファイル<br><span class="hash-preview">4b825dc6...</span>
+          </button>
+          <button class="sample-button" onclick="setSampleHash('89e6c98cbe0ffaa2f1ce9e8c19ca7ee4ad51eb42')">
+            🐳 Dockerファイル<br><span class="hash-preview">89e6c98c...</span>
+          </button>
+        </div>
+        <p class="other-hash-note">
+          💡 <strong>その他のハッシュを入力した場合：</strong> 
+          「オブジェクトが見つかりません」エラーが表示され、上記4つのサンプルハッシュが提示されます。
+        </p>
+      </div>
+      
+      <div class="input-section">
+        <input type="text" id="object-hash" placeholder="例: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
+        <div class="button-group">
+          <button id="recover-object">復元</button>
+          <button id="clear-hash" class="clear-button">クリア</button>
+        </div>
+      </div>
       <pre id="object-output"></pre>
     </section>
 
@@ -38,10 +75,339 @@
     <section id="leak" class="tab-content">
       <h2>🚨 .gitリーク検査（シミュレーション）</h2>
       <p>特定のURLに `.git/HEAD` などが存在した場合、どのように情報が辿られるかを再現します。</p>
-      <input type="text" id="target-url" placeholder="https://example.com/.git/HEAD">
-      <button id="simulate-leak">シミュレート</button>
-      <div id="leak-result">
-        <!-- シミュレーション結果表示 -->
+      
+      <div class="leak-controls">
+        <div class="leak-input-section">
+          <label for="target-url">🎯 対象URL:</label>
+          <div class="url-input-container">
+            <input type="text" id="target-url" placeholder="https://example.com">
+            <div class="preset-urls">
+              <button class="preset-url-btn" data-url="https://vulnerable-site.com">脆弱サイト例</button>
+              <button class="preset-url-btn" data-url="https://dev.company.com">開発サーバー例</button>
+              <button class="preset-url-btn" data-url="https://staging.webapp.io">ステージング例</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="scan-options">
+          <h4>🔍 検査オプション</h4>
+          <div class="option-checkboxes">
+            <label><input type="checkbox" id="check-head" checked> .git/HEAD</label>
+            <label><input type="checkbox" id="check-config" checked> .git/config</label>
+            <label><input type="checkbox" id="check-logs" checked> .git/logs/HEAD</label>
+            <label><input type="checkbox" id="check-refs" checked> .git/refs/</label>
+            <label><input type="checkbox" id="check-objects" checked> .git/objects/</label>
+          </div>
+        </div>
+        
+        <div class="speed-options">
+          <h4>⚡ スキャン速度</h4>
+          <div class="speed-controls">
+            <label class="speed-option">
+              <input type="radio" name="scan-speed" value="1" checked>
+              <span class="speed-label">1x <small>(標準)</small></span>
+            </label>
+            <label class="speed-option">
+              <input type="radio" name="scan-speed" value="2">
+              <span class="speed-label">2x <small>(高速)</small></span>
+            </label>
+            <label class="speed-option">
+              <input type="radio" name="scan-speed" value="4">
+              <span class="speed-label">4x <small>(超高速)</small></span>
+            </label>
+          </div>
+        </div>
+        
+        <button id="simulate-leak" class="scan-button">🚨 スキャン開始</button>
+      </div>
+
+      <div id="scan-progress-container" class="scan-progress-container" style="display: none;">
+        <div class="progress-header">
+          <h4>🔍 スキャン進行状況</h4>
+          <div class="progress-info">
+            <span id="progress-text">準備中...</span>
+            <span id="progress-percentage">0%</span>
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="progress-details">
+          <span id="current-step">待機中</span>
+          <span id="step-counter">0 / 0</span>
+        </div>
+        <div class="scan-controls">
+          <button id="skip-scan" class="skip-button">⏭️ 結果をすぐ見る</button>
+          <button id="pause-scan" class="control-button">⏸️ 一時停止</button>
+          <button id="resume-scan" class="control-button" style="display: none;">▶️ 再開</button>
+        </div>
+      </div>
+
+      <div id="leak-result" class="leak-result-container">
+        <div class="initial-message">
+          <h3>💡 使用方法</h3>
+          <p>上記にURLを入力して「スキャン開始」ボタンを押すと、.gitディレクトリーの漏洩検査をシミュレーションします。</p>
+          <div class="warning-box">
+            <strong>⚠️ 重要な注意:</strong>
+            <p>これは教育用シミュレーターです。実際のWebサイトへのアクセスは行いません。</p>
+            <p>実際のサイトに対して無断でこのような検査を行うことは<strong>絶対におやめください</strong>。</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leak-education">
+        <div class="accordion-header" onclick="toggleAccordion('leak-mechanism')" style="background: #f8f9fa; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-radius: 8px; border: 2px solid #dee2e6;">
+          <h3 style="margin: 0; color: #495057;">📚 .git漏洩の仕組み</h3>
+          <span id="leak-mechanism-icon" style="color: #495057; font-size: 16px;">▼</span>
+        </div>
+        <div id="leak-mechanism" class="accordion-content" style="display: block; background: white; border: 2px solid #dee2e6; border-top: none; border-radius: 0 0 8px 8px; padding: 20px;">
+          <div class="leak-flow">
+            <div class="flow-step">
+              <div class="flow-icon">1️⃣</div>
+              <div class="flow-content">
+                <h4>初期発見</h4>
+                <p>攻撃者が<code>/.git/HEAD</code>にアクセスして200 OKレスポンスを確認</p>
+              </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <div class="flow-icon">2️⃣</div>
+              <div class="flow-content">
+                <h4>メタデータ収集</h4>
+                <p><code>/.git/config</code>、<code>/.git/HEAD</code>から基本情報を取得</p>
+              </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <div class="flow-icon">3️⃣</div>
+              <div class="flow-content">
+                <h4>履歴探索</h4>
+                <p><code>/.git/logs/HEAD</code>から過去のコミットハッシュを特定</p>
+              </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <div class="flow-icon">4️⃣</div>
+              <div class="flow-content">
+                <h4>完全復元</h4>
+                <p>オブジェクトファイルを順次ダウンロードして全ファイルを復元</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 構造比較 -->
+    <section id="compare" class="tab-content">
+      <h2>⚖️ .git構造比較</h2>
+      <p>異なる.gitディレクトリー構造を並べて比較し、セキュリティリスクの違いを可視化します。</p>
+      
+      <div class="comparison-controls">
+        <h3>📋 比較対象選択</h3>
+        <div class="preset-buttons">
+          <button class="preset-button" data-preset="secure-vs-insecure">
+            🛡️ セキュアな設定 vs 危険な設定
+          </button>
+          <button class="preset-button" data-preset="private-vs-public">
+            🔒 プライベートリポジトリ vs パブリックリポジトリ
+          </button>
+          <button class="preset-button" data-preset="dev-vs-prod">
+            🔧 開発環境 vs 本番環境
+          </button>
+        </div>
+      </div>
+
+      <div class="comparison-view">
+        <div class="comparison-side" id="comparison-left">
+          <h4 id="left-title">構造A</h4>
+          <div id="left-tree" class="comparison-tree"></div>
+        </div>
+        <div class="comparison-divider">
+          <div class="vs-badge">VS</div>
+        </div>
+        <div class="comparison-side" id="comparison-right">
+          <h4 id="right-title">構造B</h4>
+          <div id="right-tree" class="comparison-tree"></div>
+        </div>
+      </div>
+
+      <div id="comparison-report" class="comparison-report">
+        <!-- 比較レポート表示エリア -->
+      </div>
+    </section>
+
+    <!-- CTFヒント -->
+    <section id="ctf" class="tab-content">
+      <h2>🚩 CTFヒント</h2>
+      <p>CTF競技でGit漏洩問題を解く際のテクニックとツールを紹介します。</p>
+      
+      <div class="ctf-categories">
+        <div class="ctf-category">
+          <h3>🔍 基本的な調査手順</h3>
+          <div class="ctf-steps">
+            <div class="ctf-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>.gitディレクトリーの存在確認</h4>
+                <div class="code-block">
+                  <code>curl -I https://target.com/.git/HEAD</code>
+                </div>
+                <p>200 OKが返れば.gitディレクトリーが公開されている</p>
+              </div>
+            </div>
+            
+            <div class="ctf-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>基本情報の取得</h4>
+                <div class="code-block">
+                  <code>curl https://target.com/.git/config<br>
+                  curl https://target.com/.git/HEAD</code>
+                </div>
+                <p>リポジトリ設定と現在のブランチ情報を確認</p>
+              </div>
+            </div>
+            
+            <div class="ctf-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>コミット履歴の探索</h4>
+                <div class="code-block">
+                  <code>curl https://target.com/.git/logs/HEAD<br>
+                  curl https://target.com/.git/logs/refs/heads/main</code>
+                </div>
+                <p>過去のコミットハッシュとメッセージを取得</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctf-category">
+          <h3>🛠️ 便利なツール</h3>
+          <div class="tool-list">
+            <div class="tool-item">
+              <h4>📦 GitHacker</h4>
+              <div class="code-block">
+                <code>python GitHacker.py --url https://target.com/.git/ --folder result</code>
+              </div>
+              <p>自動で.gitディレクトリーをダウンロードしてリポジトリを復元</p>
+            </div>
+            
+            <div class="tool-item">
+              <h4>🔧 git-dumper</h4>
+              <div class="code-block">
+                <code>git-dumper https://target.com/.git/ /tmp/repo</code>
+              </div>
+              <p>部分的に公開された.gitディレクトリーからファイルを復元</p>
+            </div>
+            
+            <div class="tool-item">
+              <h4>🌐 Wayback Machine</h4>
+              <div class="code-block">
+                <code>https://web.archive.org/web/*/https://target.com/.git/</code>
+              </div>
+              <p>過去のスナップショットから削除された.gitファイルを発見</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctf-category">
+          <h3>🎯 よくある出題パターン</h3>
+          <div class="pattern-list">
+            <div class="pattern-item">
+              <h4>🔑 パターン1: 削除されたフラグファイル</h4>
+              <div class="pattern-description">
+                <p><strong>状況:</strong> フラグファイルがコミット後に削除されている</p>
+                <p><strong>解法:</strong> <code>git log --oneline</code> でコミット履歴を確認し、<code>git show [hash]</code> で削除前の内容を表示</p>
+                <div class="code-block">
+                  <code>git log --name-status | grep -i flag<br>
+                  git show HEAD~1:flag.txt</code>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pattern-item">
+              <h4>🌿 パターン2: 別ブランチのフラグ</h4>
+              <div class="pattern-description">
+                <p><strong>状況:</strong> mainブランチにはフラグがないが、開発ブランチに存在</p>
+                <p><strong>解法:</strong> <code>git branch -a</code> で全ブランチを確認し、各ブランチをチェックアウト</p>
+                <div class="code-block">
+                  <code>git branch -a<br>
+                  git checkout develop<br>
+                  git checkout feature/secret</code>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pattern-item">
+              <h4>📝 パターン3: コミットメッセージのヒント</h4>
+              <div class="pattern-description">
+                <p><strong>状況:</strong> コミットメッセージにフラグの一部やヒントが含まれている</p>
+                <p><strong>解法:</strong> <code>git log --grep</code> でキーワード検索やログ全体を精査</p>
+                <div class="code-block">
+                  <code>git log --grep="flag"<br>
+                  git log --oneline --all<br>
+                  git log --pretty=format:"%H %s" --all</code>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pattern-item">
+              <h4>🗂️ パターン4: 設定ファイルの機密情報</h4>
+              <div class="pattern-description">
+                <p><strong>状況:</strong> .env、config.yamlなどにAPIキーやパスワードが含まれている</p>
+                <p><strong>解法:</strong> 設定ファイルの履歴を全て確認</p>
+                <div class="code-block">
+                  <code>git log -p .env<br>
+                  git log -p config.yaml<br>
+                  git show HEAD~3:config.yaml</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctf-category">
+          <h3>💡 実践テクニック</h3>
+          <div class="technique-list">
+            <div class="technique-item">
+              <h4>🔍 全ファイルの履歴検索</h4>
+              <div class="code-block">
+                <code># 特定の文字列を含むコミットを検索<br>
+                git log -S "flag{" --source --all<br>
+                git log -S "password" --source --all</code>
+              </div>
+            </div>
+            
+            <div class="technique-item">
+              <h4>📂 削除されたファイルの一覧</h4>
+              <div class="code-block">
+                <code># 削除されたファイルを全て表示<br>
+                git log --diff-filter=D --summary | grep delete</code>
+              </div>
+            </div>
+            
+            <div class="technique-item">
+              <h4>🕒 特定時点の復元</h4>
+              <div class="code-block">
+                <code># 特定のコミット時点の状態を復元<br>
+                git checkout [commit-hash]<br>
+                git checkout [commit-hash] -- filename</code>
+              </div>
+            </div>
+            
+            <div class="technique-item">
+              <h4>🔐 隠されたブランチやタグ</h4>
+              <div class="code-block">
+                <code># リモートの隠されたブランチを確認<br>
+                git ls-remote origin<br>
+                git fetch --all<br>
+                git tag -l</code>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -51,6 +417,140 @@
       🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/git-secrets-playground" target="_blank">ipusiron/git-secrets-playground</a> ）
     </div>
   </footer>
+
+  <!-- ヘルプモーダル -->
+  <div id="help-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>📚 Git Secrets Playground ヘルプ</h2>
+        <button id="close-help-modal" class="close-button">✕</button>
+      </div>
+      <div class="modal-content">
+        <div class="help-section">
+          <h3>🗂️ 構造ビューアー</h3>
+          <p><strong>目的:</strong> .gitディレクトリーの内部構造を可視化し、各ファイル・フォルダーのセキュリティリスクを理解する</p>
+          <ul>
+            <li><strong>📁 フォルダーの展開/折りたたみ:</strong> フォルダーアイコンをクリックして内容を表示・非表示</li>
+            <li><strong>📋 ハッシュ値のコピー:</strong> ハッシュ値をクリックしてクリップボードにコピー</li>
+            <li><strong>💡 ツールチップ:</strong> ファイル名にホバーして詳細情報を表示</li>
+            <li><strong>📊 統計情報:</strong> リスクレベル別の要素数とファイル・フォルダー数を表示</li>
+          </ul>
+          <p><strong>リスクレベル:</strong></p>
+          <ul>
+            <li><span style="color: #ff3333;">💥 HIGH RISK</span> - 機密情報の完全漏洩につながる重要ファイル</li>
+            <li><span style="color: #ff8800;">💣 MEDIUM RISK</span> - 部分的な情報漏洩の可能性があるファイル</li>
+            <li><span style="color: #22aa22;">⚠️ LOW RISK</span> - 基本的な構造情報のみ含むファイル</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>🔍 オブジェクト復元</h3>
+          <p><strong>目的:</strong> SHA-1ハッシュからGitオブジェクト（blob/tree/commit）の内容を復元体験</p>
+          <ul>
+            <li><strong>📄 サンプルボタン:</strong> 4種類のサンプルハッシュを一発入力</li>
+            <li><strong>🔧 手動入力:</strong> 40文字のSHA-1ハッシュを直接入力</li>
+            <li><strong>📊 復元結果:</strong> オブジェクトタイプ、サイズ、内容を表示</li>
+            <li><strong>💡 教育情報:</strong> zlibによる圧縮やGitオブジェクトの仕組みを説明</li>
+          </ul>
+          <p><strong>対応オブジェクト:</strong></p>
+          <ul>
+            <li><strong>blob:</strong> ファイルの内容データ</li>
+            <li><strong>tree:</strong> ディレクトリーの構造情報</li>
+            <li><strong>commit:</strong> コミットのメタデータ</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>🚨 リーク検査</h3>
+          <p><strong>目的:</strong> .gitディレクトリーがWeb公開された場合の攻撃手順をシミュレーション</p>
+          <ul>
+            <li><strong>🎯 URL入力:</strong> 検査対象のURL（教育用のため実際にはアクセスしません）</li>
+            <li><strong>🔍 検査オプション:</strong> チェックする.gitファイルを選択</li>
+            <li><strong>⚡ スキャン速度:</strong> 1x（標準）、2x（高速）、4x（超高速）から選択</li>
+            <li><strong>⏸️ 制御ボタン:</strong> 一時停止、再開、スキップ（結果をすぐ見る）</li>
+            <li><strong>📊 プログレスバー:</strong> スキャンの進行状況をリアルタイム表示</li>
+          </ul>
+          <p><strong>検査ファイル:</strong></p>
+          <ul>
+            <li><strong>.git/HEAD:</strong> 現在のブランチ情報</li>
+            <li><strong>.git/config:</strong> リポジトリ設定（リモートURL、ユーザー情報）</li>
+            <li><strong>.git/logs/HEAD:</strong> コミット履歴ログ（最も危険）</li>
+            <li><strong>.git/refs/:</strong> ブランチ・タグ情報</li>
+            <li><strong>.git/objects/:</strong> 全ファイルの復元データ</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>⚖️ 構造比較</h3>
+          <p><strong>目的:</strong> 異なる環境やセキュリティ設定での.git構造を比較</p>
+          <ul>
+            <li><strong>📋 プリセット比較:</strong> セキュア vs 危険、プライベート vs パブリック、開発 vs 本番</li>
+            <li><strong>📊 比較表:</strong> リスクレベル別の要素数を数値で比較</li>
+            <li><strong>💡 推奨事項:</strong> セキュリティ向上のための具体的なアドバイス</li>
+            <li><strong>🔍 詳細分析:</strong> 各設定の特徴と注意点を解説</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>🚩 CTFヒント</h3>
+          <p><strong>目的:</strong> CTF競技でのGit漏洩問題を解くためのテクニック集</p>
+          <ul>
+            <li><strong>🔍 基本調査手順:</strong> .gitディレクトリー発見から情報収集まで</li>
+            <li><strong>🛠️ 便利ツール:</strong> GitHacker、git-dumper、Wayback Machineの使い方</li>
+            <li><strong>🎯 出題パターン:</strong> よくあるフラグの隠し方と解法</li>
+            <li><strong>💡 実践テクニック:</strong> コマンドライン操作のコツ</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>⚠️ セキュリティ対策</h3>
+          <p><strong>予防策:</strong></p>
+          <ul>
+            <li><strong>Webサーバー設定:</strong> .gitディレクトリーへのアクセス拒否</li>
+            <li><strong>.gitignore設定:</strong> 機密ファイルのコミット防止</li>
+            <li><strong>pre-commitフック:</strong> 自動的なセキュリティチェック</li>
+            <li><strong>定期監査:</strong> リポジトリの機密情報スキャン</li>
+          </ul>
+          <p><strong>事後対応:</strong></p>
+          <ul>
+            <li><strong>履歴削除:</strong> git filter-branchやBFGでの完全削除</li>
+            <li><strong>強制プッシュ:</strong> リモートリポジトリへの反映</li>
+            <li><strong>影響調査:</strong> 漏洩範囲と被害の特定</li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h3>❓ よくある質問</h3>
+          <div class="faq-item">
+            <h4>Q: このツールは実際にWebサイトにアクセスしますか？</h4>
+            <p>A: いいえ。完全にクライアントサイドで動作する教育用シミュレーターです。実際の外部アクセスは一切行いません。</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: CORSエラーで構造ビューアーが表示されません</h4>
+            <p>A: ローカルサーバーを起動してください：<code>python3 -m http.server 8000</code> または <code>npx http-server -p 8000</code></p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: オブジェクト復元で「オブジェクトが見つかりません」エラーが出ます</h4>
+            <p>A: サンプルボタンの4つのハッシュのみが動作します。他のハッシュは教育用のエラーメッセージを表示します。</p>
+          </div>
+          <div class="faq-item">
+            <h4>Q: 実際の.git漏洩を発見した場合はどうすればよいですか？</h4>
+            <p>A: 該当サイトの管理者に責任を持って報告してください。無断での悪用は絶対に行わないでください。</p>
+          </div>
+        </div>
+
+        <div class="help-section">
+          <h3>🔗 関連リソース</h3>
+          <ul>
+            <li><a href="https://git-scm.com/book/ja/v2/Git%E3%81%AE%E5%86%85%E5%81%B4-Git%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" target="_blank">公式Git内部構造ドキュメント</a></li>
+            <li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10</a></li>
+            <li><a href="https://github.com/WangYihang/GitHacker" target="_blank">GitHacker Tool</a></li>
+            <li><a href="https://github.com/arthaud/git-dumper" target="_blank">git-dumper Tool</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
