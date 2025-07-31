@@ -50,15 +50,28 @@
 
 ```
 git-secrets-playground/
-├── index.html
-├── style.css
-├── script.js
+├── index.html                      # メインHTMLファイル（5つのタブとモーダル構造）
+├── style.css                       # CSSスタイルシート（レスポンシブ対応・アニメーション込み）
+├── script.js                       # JavaScriptメインロジック（全機能の実装）
 ├── data/
-│ └── sample_git_structure.json
+│   └── sample_git_structure.json   # .git構造サンプルデータ（リスクレベル含む）
 ├── assets/
-│ └── (アイコンや図解画像など)
-└── README.md
+│   └── screenshot.png              # デモ用スクリーンショット画像
+├── .nojekyll                       # GitHub Pages用設定ファイル
+├── LICENSE                         # MITライセンス
+├── CLAUDE.md                       # Claude開発履歴・メモ
+└── README.md                       # プロジェクト説明書（本ファイル）
 ```
+
+### 📋 ファイル詳細
+
+| ファイル | 役割 | 主な内容 |
+|---------|------|----------|
+| **index.html** | UI構造定義 | 5タブレイアウト、ヘルプモーダル、プログレスバー要素 |
+| **style.css** | デザイン・レイアウト | レスポンシブCSS、アニメーション、モーダルスタイル |
+| **script.js** | アプリケーションロジック | ツリー表示、スキャン制御、状態管理、イベント処理 |
+| **sample_git_structure.json** | 構造データ | .gitディレクトリー構造とセキュリティリスク情報 |
+| **screenshot.png** | 視覚資料 | アプリケーションのスクリーンショット |
 
 ---
 
