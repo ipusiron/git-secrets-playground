@@ -18,14 +18,15 @@ header {
 .header-content {
   max-width: 960px;
   margin: 0 auto;
+  position: relative;
 }
 
 .title-section {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   margin-bottom: 0.3rem;
+  position: relative;
 }
 
 h1 {
@@ -38,26 +39,37 @@ h1 {
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 0.9rem;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  flex-grow: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  position: relative;
-  top: -1px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 10;
   pointer-events: auto;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  padding: 0;
+  line-height: 1;
 }
 
 .help-button:hover {
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.05);
+  transform: translateY(-50%) scale(1.05);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -1654,14 +1666,24 @@ footer {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  font-size: 1.2em;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  max-width: 30px;
+  max-height: 30px;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  aspect-ratio: 1;
+  line-height: 1;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 .close-button:hover {
@@ -1798,13 +1820,32 @@ footer {
     max-height: calc(95vh - 100px);
   }
   
-  .title-section {
-    flex-direction: column;
-    gap: 10px;
+  .header-content {
+    padding: 0 15px;
   }
   
   .help-button {
-    position: static;
-    align-self: center;
+    right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0 10px;
+  }
+  
+  .help-button {
+    right: 0;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 26px;
+    max-height: 26px;
+    font-size: 0.75rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
   }
 }
