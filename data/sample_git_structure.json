@@ -4,11 +4,116 @@
   "children": [
     { "name": "HEAD", "type": "file", "risk": "high" },
     { "name": "config", "type": "file", "risk": "medium" },
+    { "name": "description", "type": "file", "risk": "low" },
+    { "name": "index", "type": "file", "risk": "high" },
+    { "name": "packed-refs", "type": "file", "risk": "medium" },
     {
       "name": "objects",
       "type": "folder",
+      "risk": "high",
       "children": [
-        { "name": "e6/9de29b...", "type": "file", "risk": "high" }
+        { "name": "info", "type": "folder" },
+        { "name": "pack", "type": "folder" },
+        { 
+          "name": "e6", 
+          "type": "folder",
+          "children": [
+            { "name": "9de29bb2d1d6434b8b29ae775ad8c2e48c5391", "type": "file", "risk": "high" }
+          ]
+        },
+        { 
+          "name": "55", 
+          "type": "folder",
+          "children": [
+            { "name": "7db03de997c86a4a028e1ebd3a1ceb225be238", "type": "file", "risk": "high" }
+          ]
+        },
+        { 
+          "name": "4b", 
+          "type": "folder",
+          "children": [
+            { "name": "825dc642cb6eb9a060e54bf8d69288fbee4904", "type": "file", "risk": "high" }
+          ]
+        },
+        { 
+          "name": "89", 
+          "type": "folder",
+          "children": [
+            { "name": "e6c98cbe0ffaa2f1ce9e8c19ca7ee4ad51eb42", "type": "file", "risk": "high" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "refs",
+      "type": "folder",
+      "risk": "high",
+      "children": [
+        {
+          "name": "heads",
+          "type": "folder",
+          "children": [
+            { "name": "main", "type": "file", "risk": "high" },
+            { "name": "develop", "type": "file", "risk": "high" }
+          ]
+        },
+        {
+          "name": "remotes",
+          "type": "folder",
+          "children": [
+            {
+              "name": "origin",
+              "type": "folder",
+              "children": [
+                { "name": "main", "type": "file", "risk": "medium" },
+                { "name": "develop", "type": "file", "risk": "medium" }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "tags",
+          "type": "folder",
+          "children": [
+            { "name": "v1.0.0", "type": "file", "risk": "low" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "logs",
+      "type": "folder",
+      "risk": "medium",
+      "children": [
+        { "name": "HEAD", "type": "file", "risk": "medium" },
+        {
+          "name": "refs",
+          "type": "folder",
+          "children": [
+            {
+              "name": "heads",
+              "type": "folder",
+              "children": [
+                { "name": "main", "type": "file", "risk": "medium" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hooks",
+      "type": "folder",
+      "children": [
+        { "name": "pre-commit.sample", "type": "file" },
+        { "name": "pre-push.sample", "type": "file" }
+      ]
+    },
+    {
+      "name": "info",
+      "type": "folder",
+      "children": [
+        { "name": "exclude", "type": "file", "risk": "low" }
       ]
     }
   ]

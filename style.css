@@ -37,6 +37,7 @@ h1 {
 
 .tab-button {
   background: #ffffff;
+  color: #212529;
   border: 1px solid #ced4da;
   padding: 0.5rem 1rem;
   margin: 0.3rem;
@@ -48,6 +49,7 @@ h1 {
 
 .tab-button:hover {
   background: #e9ecef;
+  color: #212529;
 }
 
 .tab-button.active {
@@ -63,7 +65,7 @@ main {
   padding: 0 1rem;
 }
 
-section {
+.tab-content {
   display: none;
   background: white;
   border: 1px solid #dee2e6;
@@ -72,7 +74,7 @@ section {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-section.active {
+.tab-content.active {
   display: block;
 }
 
@@ -109,10 +111,53 @@ pre {
   overflow-x: auto;
 }
 
-/* 構造ビュー専用のスタイル（今後拡張） */
-#structure-viewer {
+/* 構造ビュー専用のスタイル */
+#git-tree {
   padding: 1rem;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 6px;
+  overflow-x: auto;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+#git-tree code {
+  background: #2d2d2d;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #9cdcfe;
+}
+
+/* リーク検査結果のスタイル */
+#leak-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  min-height: 100px;
+}
+
+#leak-result code {
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 3px;
   font-family: monospace;
+  font-size: 0.9em;
+}
+
+/* オブジェクト出力のスタイル */
+#object-output {
+  margin-top: 1rem;
+  min-height: 100px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1rem;
+  border-radius: 6px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* フッター */
