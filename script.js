@@ -1,3 +1,20 @@
+// --- セキュリティ関数: HTMLエスケープ ---
+/**
+ * XSS攻撃を防ぐためにユーザー入力をHTMLエスケープする
+ * @param {string} text - エスケープする文字列
+ * @returns {string} エスケープされた文字列
+ */
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
 // --- タブ切り替え処理 ---
 document.querySelectorAll('.tab-button').forEach(button => {
   button.addEventListener('click', () => {
@@ -1113,15 +1130,18 @@ async function startNewScan(url, result) {
   };
 
   // 動的にステップを生成
+  // XSS対策: URLをHTMLエスケープ
+  const escapedUrl = escapeHtml(url);
+
   const steps = [
-    { icon: '🎯', text: `対象URL: <code>${url}</code>`, delay: 0, type: 'info' }
+    { icon: '🎯', text: `対象URL: <code>${escapedUrl}</code>`, delay: 0, type: 'info' }
   ];
 
   let stepDelay = 500;
-  
+
   if (checkOptions.head) {
     steps.push(
-      { icon: '📡', text: `<code>${url}/.git/HEAD</code> にアクセスを試行...`, delay: stepDelay, type: 'scan' },
+      { icon: '📡', text: `<code>${escapedUrl}/.git/HEAD</code> にアクセスを試行...`, delay: stepDelay, type: 'scan' },
       { icon: '✅', text: 'HEADファイルを取得: <code>ref: refs/heads/main</code>', delay: stepDelay + 500, type: 'success' }
     );
     stepDelay += 1000;
@@ -1129,7 +1149,7 @@ async function startNewScan(url, result) {
 
   if (checkOptions.config) {
     steps.push(
-      { icon: '📡', text: `<code>${url}/.git/config</code> をスキャン...`, delay: stepDelay, type: 'scan' },
+      { icon: '📡', text: `<code>${escapedUrl}/.git/config</code> をスキャン...`, delay: stepDelay, type: 'scan' },
       { icon: '🔍', text: 'リポジトリ設定を発見: リモートURL、ユーザー情報を取得', delay: stepDelay + 500, type: 'info' }
     );
     stepDelay += 1000;
@@ -1137,7 +1157,7 @@ async function startNewScan(url, result) {
 
   if (checkOptions.logs) {
     steps.push(
-      { icon: '📡', text: `<code>${url}/.git/logs/HEAD</code> をスキャン...`, delay: stepDelay, type: 'scan' },
+      { icon: '📡', text: `<code>${escapedUrl}/.git/logs/HEAD</code> をスキャン...`, delay: stepDelay, type: 'scan' },
       { icon: '📜', text: 'コミット履歴ログを発見: 過去のハッシュ値を特定', delay: stepDelay + 500, type: 'warning' }
     );
     stepDelay += 1000;
@@ -1145,7 +1165,7 @@ async function startNewScan(url, result) {
 
   if (checkOptions.refs) {
     steps.push(
-      { icon: '📡', text: `<code>${url}/.git/refs/</code> をスキャン...`, delay: stepDelay, type: 'scan' },
+      { icon: '📡', text: `<code>${escapedUrl}/.git/refs/</code> をスキャン...`, delay: stepDelay, type: 'scan' },
       { icon: '🌿', text: 'ブランチ情報を発見: main, develop, feature/secrets', delay: stepDelay + 500, type: 'info' }
     );
     stepDelay += 1000;
@@ -1153,7 +1173,7 @@ async function startNewScan(url, result) {
 
   if (checkOptions.objects) {
     steps.push(
-      { icon: '📡', text: `<code>${url}/.git/objects/</code> をスキャン...`, delay: stepDelay, type: 'scan' },
+      { icon: '📡', text: `<code>${escapedUrl}/.git/objects/</code> をスキャン...`, delay: stepDelay, type: 'scan' },
       { icon: '📦', text: 'オブジェクトファイルを発見: コミット・ツリー・blobを復元中...', delay: stepDelay + 500, type: 'warning' },
       { icon: '💾', text: '機密ファイルを復元: .env, config.yaml, private.key', delay: stepDelay + 1000, type: 'danger' }
     );
