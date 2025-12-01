@@ -10,45 +10,62 @@ Git Secrets Playground is an educational web application that demonstrates Git r
 
 ### Running the Application
 ```bash
-# Open index.html directly in a browser - no build process required
-# Alternatively, use a simple HTTP server:
+# IMPORTANT: Must use a local server due to fetch() for JSON data
 python3 -m http.server 8000
+# or
+npx http-server -p 8000
 # Then visit http://localhost:8000
 ```
 
+Opening `index.html` directly will cause CORS errors when loading `sample_git_structure.json`.
+
 ### Deployment
-The application is deployed via GitHub Pages at: https://ipusiron.github.io/git-secrets-playground/
+GitHub Pages: https://ipusiron.github.io/git-secrets-playground/
 
 ## Architecture
 
-This is a client-side only web application with no build process or dependencies:
+Client-side only web application with zero dependencies (pure HTML/CSS/JavaScript ES6+).
 
-### File Structure
-- `index.html` - Main application structure with three tabs (Structure Viewer, Object Recovery, Leak Inspector)
-- `script.js` - Handles tab switching and simulation logic
-- `style.css` - Responsive design with dark theme
-- `data/sample_git_structure.json` - Sample Git directory structure for visualization
+### Core Files
+- `index.html` - UI structure with 5 tabs + help modal
+- `script.js` - All application logic (~700 lines)
+- `style.css` - Responsive dark theme with animations
+- `data/sample_git_structure.json` - Tree data with risk levels per file
 
-### Key Implementation Areas
+### Tab Features (All Implemented)
 
-1. **Structure Viewer Tab**: Currently needs implementation to parse and display the tree structure from `sample_git_structure.json`
+1. **Structure Viewer** - Renders `.git` directory tree from JSON with:
+   - Collapsible folders (`toggleFolder()`)
+   - Risk level badges (HIGH/MEDIUM/LOW)
+   - Hash file click-to-copy with toast notifications
+   - Statistics panel
 
-2. **Object Recovery Tab**: Placeholder implementation - needs:
-   - SHA-1 hash validation
-   - Simulated Git object parsing (blob/tree/commit)
-   - Display logic for different object types
+2. **Object Recovery** - Simulates Git object lookup:
+   - 4 hardcoded sample hashes that return mock object data
+   - SHA-1 validation (40 hex chars)
+   - Other hashes show educational "not found" message
 
-3. **Leak Inspector Tab**: Basic simulation exists, shows the attack chain when `.git/HEAD` is exposed
+3. **Leak Inspector** - Attack chain simulation:
+   - Configurable scan options and speed (1x/2x/4x)
+   - Pause/resume/skip controls
+   - Progress bar with step-by-step animation
+   - No actual network requests
 
-### Development Patterns
-- Event-driven architecture with tab switching
-- No external dependencies or frameworks
-- All processing happens client-side
-- Educational focus - all features are simulations, no actual Git operations
+4. **Structure Compare** - Side-by-side `.git` comparison:
+   - 3 presets (secure vs insecure, private vs public, dev vs prod)
+   - Risk analysis table and recommendations
 
-## Important Notes
+5. **CTF Hints** - Static reference for CTF Git challenges
 
-- This is an educational tool - emphasize security awareness and responsible use
-- All demonstrations are simulations without actual network requests
-- The application should work entirely offline once loaded
-- Maintain the simple, dependency-free architecture when adding features
+### Key Patterns
+- `escapeHtml()` for XSS prevention on user input
+- Async state management for scan simulation (`scanState` object)
+- Recursive DOM generation for tree rendering
+- Accordion toggle pattern for collapsible sections
+
+## Security Considerations
+
+- Content Security Policy set in `<meta>` tag
+- User inputs are HTML-escaped before DOM insertion
+- All features are simulations - no external requests
+- Educational tool - emphasize responsible disclosure when discussing real vulnerabilities

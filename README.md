@@ -1,3 +1,39 @@
+<!--
+---
+id: day031
+slug: git-secrets-playground
+
+title: "Git Secrets Playground"
+
+subtitle_ja: "Git情報漏洩シミュレーター"
+subtitle_en: "Git Information Leak Simulator"
+
+description_ja: ".gitディレクトリーが外部に公開された際の情報漏洩リスクを疑似体験できる教育用シミュレーター。構造ビューアー、オブジェクト復元、リーク検査、構造比較、CTFヒントの5つのモードを搭載。"
+description_en: "An educational simulator that demonstrates the security risks when .git directories are exposed. Features 5 modes: Structure Viewer, Object Recovery, Leak Inspector, Structure Compare, and CTF Hints."
+
+category_ja:
+  - フォレンジック
+  - 情報漏洩対策
+category_en:
+  - Forensics
+  - Information Leak Prevention
+
+difficulty: 3
+
+tags:
+  - git
+  - security
+  - education
+  - simulation
+  - ctf
+
+repo_url: "https://github.com/ipusiron/git-secrets-playground"
+demo_url: "https://ipusiron.github.io/git-secrets-playground/"
+
+hub: true
+---
+-->
+
 # Git Secrets Playground - Git情報漏洩シミュレーター
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/git-secrets-playground?style=social)
