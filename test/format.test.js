@@ -5,10 +5,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
 
-for (const file of ['js/git-core.js', 'js/git-data.js', 'js/i18n.js', 'test/core.test.js', 'test/format.test.js']) {
+const sources = ['style.css', 'index.html', ...['js', 'test'].flatMap(dir =>
+  fs.readdirSync(path.join(root, dir)).filter(file => file.endsWith('.js')).map(file => `${dir}/${file}`))];
+for (const file of sources) {
   test(`readable new source: ${file}`, () => {
     const lines = fs.readFileSync(path.join(root, file), 'utf8').split(/\r?\n/);
-    lines.forEach((line, index) => assert.ok([...line].length <= 160, `${file}:${index + 1}`));
+    const maximum = file === 'index.html' ? 250 : 160;
+    lines.forEach((line, index) => assert.ok([...line].length <= maximum, `${file}:${index + 1}`));
   });
 }
 
