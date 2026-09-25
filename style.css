@@ -2262,6 +2262,86 @@ h1 {
   }
 }
 
+.invest-layout, .invest-opened, .git-object {
+  min-width: 0;
+}
+
+.invest-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.invest-files {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.invest-files button, .object-link {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.invest-files button[aria-pressed="true"] {
+  outline: 3px solid var(--secondary);
+  outline-offset: 1px;
+}
+
+#invest-output, .git-object {
+  overflow-wrap: anywhere;
+  color: var(--secondary);
+  background: var(--white);
+}
+
+#invest-output {
+  padding: 1rem;
+  border: 1px solid var(--secondary);
+}
+
+#invest-output pre, .git-object pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--secondary);
+  background: var(--code-bg);
+  padding: 0.75rem;
+}
+
+.git-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.git-object-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.git-object-table th, .git-object-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--secondary);
+  overflow-wrap: anywhere;
+}
+
+.invest-goal {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+#investigation summary {
+  min-height: 44px;
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+@media (min-width: 769px) {
+  .invest-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;

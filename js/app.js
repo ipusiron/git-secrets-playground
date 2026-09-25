@@ -1110,6 +1110,162 @@ document.querySelectorAll('.preset-button').forEach(control => {
   control.addEventListener('click', () => loadPresetComparison(control.dataset.preset));
 });
 
+// Investigation state is in memory only. A selected-file identity guards async results.
+const investigation = { opened: null, retrieved: new Set(), answer: null };
+
+function gitIdentityDate(identity) {
+  const match = / (\d+) ([+-])(\d{2})(\d{2})$/.exec(identity || '');
+  if (!match) return identity || '';
+  const offset = (Number(match[3]) * 60 + Number(match[4])) * (match[2] === '+' ? 1 : -1);
+  const date = new Date((Number(match[1]) + offset * 60) * 1000);
+  return identity + ' (' + date.toISOString().slice(0, 19).replace('T', ' ') + ' ' +
+    match[2] + match[3] + match[4] + ')';
+}
+
+function objectLink(hash) {
+  const control = button(i18n.t('object.open', { hash }), () => {
+    byId('tab-investigation').click();
+    selectInvestigationFile(GitCore.objectPath(hash));
+    byId('invest-decompress')?.focus();
+  }, 'object-link');
+  control.dataset.hash = hash;
+  control.disabled = !GitCore.webCryptoAvailable() || !Object.hasOwn(SCENARIO.objects, hash);
+  return control;
+}
+
+// Shared object renderer: tables are nodes, and blob content is always plain text.
+function renderGitObject(obj) {
+  const wrapper = element('div', '', 'git-object');
+  const metadata = element('dl', '', 'object-metadata');
+  for (const [key, value] of [['header', obj.type + ' ' + obj.size], ['hash', obj.hash],
+    ['type', obj.type], ['size', String(obj.size)]]) {
+    metadata.append(element('dt', i18n.t(`object.${key}`)), element('dd', value));
+  }
+  wrapper.append(metadata);
+  if (obj.type === 'blob' || obj.type === 'tag') {
+    wrapper.append(element('pre', new TextDecoder().decode(obj.body), 'object-content'));
+    return wrapper;
+  }
+  const table = element('table', '', 'git-object-table');
+  const body = element('tbody');
+  if (obj.type === 'commit') {
+    const commit = GitCore.parseCommit(obj.body);
+    for (const [key, value] of [['tree', commit.tree], ...commit.parents.map(hash => ['parent', hash]),
+      ['author', gitIdentityDate(commit.author)], ['committer', gitIdentityDate(commit.committer)], ['message', commit.message]]) {
+      const row = element('tr');
+      const cell = element('td');
+      cell.append(key === 'tree' || key === 'parent' ? objectLink(value) : element('span', value));
+      row.append(element('th', i18n.t(`object.${key}`)), cell);
+      body.append(row);
+    }
+  } else {
+    const head = element('thead');
+    const row = element('tr');
+    for (const key of ['mode', 'type', 'name', 'hash']) row.append(element('th', i18n.t(`object.${key}`)));
+    head.append(row);
+    table.append(head);
+    for (const entry of GitCore.parseTree(obj.body)) {
+      const item = element('tr');
+      item.append(element('td', entry.mode), element('td', entry.type), element('td', entry.name));
+      const cell = element('td');
+      cell.append(objectLink(entry.hash));
+      item.append(cell);
+      body.append(item);
+    }
+  }
+  table.append(body);
+  const scroll = element('div', '', 'git-table-scroll');
+  scroll.append(table);
+  wrapper.append(scroll);
+  return wrapper;
+}
+
+function selectInvestigationFile(path) {
+  if (!GitCore.webCryptoAvailable()) return;
+  investigation.opened = { path };
+  investigation.retrieved.add(path);
+  renderInvestigation();
+}
+
+async function decompressInvestigation() {
+  const selected = investigation.opened;
+  if (!selected || selected.busy || !GitCore.webCryptoAvailable()) return;
+  selected.busy = true;
+  renderInvestigationOutput();
+  try {
+    const hash = selected.path.slice('.git/objects/'.length).replace('/', '');
+    selected.object = await GitCore.openLoose(hash, GitCore.hexToBytes(SCENARIO.objects[hash]));
+  } catch (error) {
+    selected.error = error.message === 'badZlib' ? 'object.badZlib' : 'object.failed';
+  } finally {
+    selected.busy = false;
+    if (investigation.opened === selected) renderInvestigationOutput();
+  }
+}
+
+function renderInvestigationOutput() {
+  const output = byId('invest-output');
+  output.replaceChildren();
+  const selected = investigation.opened;
+  if (!selected) {
+    output.append(element('p', i18n.t('invest.select')));
+    return;
+  }
+  output.append(element('h4', selected.path));
+  if (Object.hasOwn(SCENARIO.files, selected.path)) {
+    const text = SCENARIO.files[selected.path];
+    output.append(element('pre', text));
+    if (selected.path === '.git/HEAD') {
+      output.append(button('refs/heads/main', () => selectInvestigationFile('.git/refs/heads/main')));
+    }
+    const hashes = new Set(text.match(/[a-f0-9]{40}/g) || []);
+    hashes.forEach(hash => { if (Object.hasOwn(SCENARIO.objects, hash)) output.append(objectLink(hash)); });
+    return;
+  }
+  const hash = selected.path.slice('.git/objects/'.length).replace('/', '');
+  const hex = SCENARIO.objects[hash];
+  output.append(element('p', i18n.t('invest.compressed', { n: hex.length / 2 })), element('pre', hex.slice(0, 64)));
+  const control = button(i18n.t(selected.busy ? 'invest.busy' : 'invest.inflate'), decompressInvestigation);
+  control.id = 'invest-decompress';
+  control.disabled = selected.busy || !GitCore.webCryptoAvailable();
+  output.append(control);
+  if (selected.error) output.append(element('p', i18n.t(selected.error), 'error-message'));
+  if (selected.object) {
+    output.append(element('p', i18n.t(selected.object.matches ? 'invest.match' : 'invest.mismatch'), 'hash-verdict'));
+    output.append(renderGitObject(selected.object));
+  }
+}
+
+function renderInvestigation() {
+  const unavailable = !GitCore.webCryptoAvailable();
+  byId('invest-unavailable').hidden = !unavailable;
+  byId('invest-check').disabled = unavailable;
+  const files = [...Object.keys(SCENARIO.files), ...Object.keys(SCENARIO.objects).sort().map(GitCore.objectPath)];
+  byId('invest-files').replaceChildren(...files.map(path => {
+    const retrieved = investigation.retrieved.has(path);
+    const control = button((retrieved ? '✓ ' : '') + path, () => selectInvestigationFile(path));
+    control.dataset.path = path;
+    control.disabled = unavailable;
+    control.setAttribute('aria-pressed', String(investigation.opened?.path === path));
+    if (retrieved) control.title = i18n.t('invest.downloaded');
+    return control;
+  }));
+  renderInvestigationOutput();
+  const feedback = byId('invest-feedback');
+  feedback.replaceChildren();
+  if (investigation.answer !== null) {
+    feedback.append(element('p', i18n.t(investigation.answer ? 'invest.correct' : 'invest.wrong')));
+    if (investigation.answer) feedback.append(list([1, 2, 3].map(n => i18n.t(`invest.explain${n}`))));
+  }
+}
+
+byId('invest-check').addEventListener('click', () => {
+  investigation.answer = byId('invest-answer').value.trim() === SCENARIO.answer.password;
+  renderInvestigation();
+});
+renderInvestigation();
+i18n.onChange(renderInvestigation);
+
 loadGitStructure();
 renderScan();
 

@@ -25,6 +25,8 @@
       <button type="button" class="tab-button" data-tab="objects" id="tab-objects" role="tab" aria-controls="objects" aria-selected="false" tabindex="-1"><span data-i18n="html.6">オブジェクト復元</span></button>
       <button type="button" class="tab-button" data-tab="leak" id="tab-leak" role="tab" aria-controls="leak" aria-selected="false" tabindex="-1"><span data-i18n="html.7">リーク検査</span></button>
       <button type="button" class="tab-button" data-tab="compare" id="tab-compare" role="tab" aria-controls="compare" aria-selected="false" tabindex="-1"><span data-i18n="html.8">構造比較</span></button>
+      <button type="button" class="tab-button" data-tab="investigation" id="tab-investigation" role="tab"
+        aria-controls="investigation" aria-selected="false" tabindex="-1" data-i18n="invest.title">🕵️ 履歴の調査</button>
       <button type="button" class="tab-button" data-tab="ctf" id="tab-ctf" role="tab" aria-controls="ctf" aria-selected="false" tabindex="-1"><span data-i18n="html.9">CTFヒント</span></button>
     </nav>
   </header>
@@ -417,6 +419,37 @@
         </div>
       </div>
     </section>
+    <section id="investigation" class="tab-content" role="tabpanel" aria-labelledby="tab-investigation">
+      <h2 data-i18n="invest.title">🕵️ 履歴の調査</h2>
+      <p data-i18n="invest.intro"></p>
+      <p class="simulation-notice" data-i18n="invest.notice"></p>
+      <p id="invest-unavailable" class="error-message" data-i18n="object.unavailable" hidden></p>
+      <div class="invest-layout">
+        <div>
+          <h3 data-i18n="invest.files">取り出せるファイル</h3>
+          <div id="invest-files" class="invest-files"></div>
+        </div>
+        <div class="invest-opened">
+          <h3 data-i18n="invest.opened">開いたファイル</h3>
+          <div id="invest-output" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="invest-goal">
+        <label for="invest-answer" data-i18n="invest.answer">見つけた秘密（パスワード）</label>
+        <input type="text" id="invest-answer" autocomplete="off">
+        <button type="button" id="invest-check" data-i18n="invest.check">答え合わせ</button>
+        <div id="invest-feedback" aria-live="polite"></div>
+      </div>
+      <details id="invest-hint1">
+        <summary data-i18n="invest.hint1">ヒント1</summary><p data-i18n="invest.hintBody1"></p>
+      </details>
+      <details id="invest-hint2">
+        <summary data-i18n="invest.hint2">ヒント2</summary><p data-i18n="invest.hintBody2"></p>
+      </details>
+      <details id="invest-hint3">
+        <summary data-i18n="invest.hint3">ヒント3</summary><p data-i18n="invest.hintBody3"></p>
+      </details>
+    </section>
   </main>
 
   <footer>
@@ -561,6 +594,7 @@
 
   <script src="js/git-core.js"></script>
   <script src="js/git-data.js"></script>
+  <script src="js/scenario-data.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>

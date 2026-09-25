@@ -6,6 +6,16 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 
+test('investigation tab, controls and embedded scenario exist', () => {
+  assert.match(html, /id="tab-investigation" role="tab"\s+aria-controls="investigation" aria-selected="false"/);
+  assert.match(html, /id="investigation" class="tab-content" role="tabpanel" aria-labelledby="tab-investigation"/);
+  assert.ok(html.indexOf('data-tab="investigation"') < html.indexOf('data-tab="ctf"'));
+  for (const id of ['invest-files', 'invest-output', 'invest-answer', 'invest-check', 'invest-hint1', 'invest-hint2', 'invest-hint3']) {
+    assert.ok(html.includes('id="' + id + '"'));
+  }
+  assert.match(html, /<script src="js\/scenario-data.js"><\/script>/);
+});
+
 test('strict CSP, referrer and scripting fallback', () => {
   const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
   assert.equal(csp, "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; " +
@@ -29,9 +39,9 @@ test('classic scripts use safe DOM APIs and embedded data', () => {
 
 test('tabs, modal, labels, links and button types are accessible', () => {
   assert.match(html, /role="tablist"/);
-  assert.equal((html.match(/role="tab"/g) || []).length, 5);
-  assert.equal((html.match(/role="tabpanel"/g) || []).length, 5);
-  assert.equal((html.match(/aria-selected="(?:true|false)"/g) || []).length, 5);
+  assert.equal((html.match(/role="tab"/g) || []).length, 6);
+  assert.equal((html.match(/role="tabpanel"/g) || []).length, 6);
+  assert.equal((html.match(/aria-selected="(?:true|false)"/g) || []).length, 6);
   assert.match(html, /role="dialog"[^>]*aria-labelledby="help-title"/);
   for (const match of html.matchAll(/<button\b[^>]*>/g)) assert.match(match[0], /type="button"/);
   for (const match of html.matchAll(/<label[^>]*for="([^"]+)"/g)) {
