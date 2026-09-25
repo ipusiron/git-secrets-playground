@@ -2247,7 +2247,14 @@ h1 {
 
   .help-button {
     grid-column: 3;
+    grid-row: 1;
     justify-self: end;
+  }
+
+  #language-button {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
   }
 
   .tab-content {

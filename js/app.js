@@ -78,7 +78,7 @@ function renderTree(node, path = '.git', prefix = '', isLast = true, parentHash 
     toggle.dataset.folder = path;
     toggle.setAttribute('aria-expanded', String(!children.hidden));
     toggle.setAttribute('aria-controls', children.id);
-    toggle.setAttribute('aria-label', `${node.name}を開閉`);
+    toggle.setAttribute('aria-label', i18n.t('app.0', { p0: node.name }));
     row.append(toggle);
   } else {
     row.append(element('span', node.type === 'folder' ? '📁 ' : '📄 '));
@@ -88,7 +88,7 @@ function renderTree(node, path = '.git', prefix = '', isLast = true, parentHash 
   if (isHashFile) {
     const hash = parentHash + node.name;
     const copy = button(node.name, () => copyHash(hash), 'hash-clickable');
-    copy.title = `先頭2桁とファイル名を連結した40文字のハッシュをコピー: ${hash}`;
+    copy.title = i18n.t('app.1', { p0: hash });
     row.append(copy);
   } else {
     const name = element('span', node.name, 'file-tooltip');
@@ -131,7 +131,7 @@ function showToast(text, failed = false) {
 }
 
 async function copyHash(hash) {
-  const success = `✅ ハッシュをコピーしました: ${hash.slice(0, 8)}… オブジェクト復元タブに貼り付けられます。`;
+  const success = i18n.t('app.2', { p0: hash.slice(0, 8) });
   try {
     await navigator.clipboard.writeText(hash);
     showToast(success);
@@ -149,7 +149,7 @@ async function copyHash(hash) {
     }
     input.remove();
     if (focused) focused.focus();
-    showToast(copied ? success : 'コピーできませんでした。ハッシュを選択してコピーしてください。', !copied);
+    showToast(copied ? success : i18n.t('app.3'), !copied);
   }
 }
 
@@ -159,13 +159,13 @@ function generateStatistics(node) {
 
 function renderStatistics(stats) {
   const panel = element('div', '', 'statistics-panel');
-  panel.append(element('h3', '📊 構造統計情報'));
+  panel.append(element('h3', i18n.t('app.4')));
   const grid = element('div', '', 'stats-grid');
   const rows = [
-    [stats.files + stats.folders, '総アイテム数', `${stats.folders} フォルダー, ${stats.files} ファイル`, ''],
-    [stats.high, 'HIGH RISK', '機密性の高い要素', 'risk-high'],
-    [stats.medium, 'MEDIUM RISK', '注意が必要な要素', 'risk-medium'],
-    [stats.low, 'LOW RISK', '軽微なリスク要素', 'risk-low']
+    [stats.files + stats.folders, i18n.t('app.5'), i18n.t('app.6', { p0: stats.folders, p1: stats.files }), ''],
+    [stats.high, 'HIGH RISK', i18n.t('app.7'), 'risk-high'],
+    [stats.medium, 'MEDIUM RISK', i18n.t('app.8'), 'risk-medium'],
+    [stats.low, 'LOW RISK', i18n.t('app.9'), 'risk-low']
   ];
   rows.forEach(([count, label, detail, className]) => {
     const item = element('div', '', `stat-item ${className}`);
@@ -175,7 +175,7 @@ function renderStatistics(stats) {
     grid.append(item);
   });
   panel.append(grid);
-  panel.append(element('div', `リスクレベル分析: ${stats.high + stats.medium + stats.low}個の要素にリスクがあります`, 'risk-summary'));
+  panel.append(element('div', i18n.t('app.10', { p0: stats.high + stats.medium + stats.low }), 'risk-summary'));
   return panel;
 }
 
@@ -184,12 +184,16 @@ function loadGitStructure() {
   byId('git-tree').replaceChildren(renderTree(GIT_STRUCTURE));
 }
 
-const sampleDescriptions = [
-  '.gitkeepファイルなどの空ファイル',
-  'サンプルテキストファイル',
-  '機密情報を含む設定ファイル（⚠️ 本番環境では危険）',
-  'Dockerコンテナ設定ファイル'
+function getSampleDescriptions() {
+  return [
+  i18n.t('app.11'),
+  i18n.t('app.12'),
+  i18n.t('app.13'),
+  i18n.t('app.14')
 ];
+}
+let sampleDescriptions = getSampleDescriptions();
+
 let recoveredHash = null;
 
 function toggleAccordion(id) {
@@ -204,28 +208,28 @@ function toggleAccordion(id) {
 
 function recoveryMethods(hash) {
   const wrapper = element('div', '', 'recovery-methods');
-  const header = button('🔧 実際のGitオブジェクト復元方法', () => toggleAccordion('method-details'), 'accordion-header');
+  const header = button(i18n.t('app.15'), () => toggleAccordion('method-details'), 'accordion-header');
   const detail = element('div', '', 'accordion-content');
   detail.id = 'method-details';
   detail.hidden = true;
   header.setAttribute('aria-expanded', 'false');
   header.setAttribute('aria-controls', detail.id);
-  detail.append(element('p', '次は許可されたテスト環境でのみ使うコマンドの例です。ここでは実行しません。'));
+  detail.append(element('p', i18n.t('app.16')));
   const sections = [
-    ['1. オブジェクトファイルの取得',
+    [i18n.t('app.17'),
       `curl -s https://target.com/${GitCore.objectPath(hash)} -o object_file\n` +
       `wget https://target.com/${GitCore.objectPath(hash)} -O object_file`],
-    ['2. zlibで圧縮されたオブジェクトを解凍',
+    [i18n.t('app.18'),
       `python3 -c "import zlib; print(zlib.decompress(open('object_file', 'rb').read()).decode('utf-8', errors='ignore'))"\n` +
       `ruby -e "require 'zlib'; puts Zlib.inflate(File.binread('object_file'))"\nopenssl zlib -d -in object_file`],
-    ['3. Gitコマンドを使用', `git cat-file -p ${hash}\ngit cat-file -t ${hash}\ngit cat-file -s ${hash}`],
-    ['4. 自動化ツール', 'python3 GitHack.py https://target.com/.git/\n' +
+    [i18n.t('app.19'), `git cat-file -p ${hash}\ngit cat-file -t ${hash}\ngit cat-file -s ${hash}`],
+    [i18n.t('app.20'), 'python3 GitHack.py https://target.com/.git/\n' +
       'git-dumper https://target.com/.git/ output_dir\n./rip-git.pl -v -u https://target.com/.git/']
   ];
   sections.forEach(([title, code]) => {
     detail.append(element('h4', title), element('pre', code));
   });
-  detail.append(element('p', '⚠️ 教育目的のみ。自分の環境、CTF、事前に許可されたテスト環境でのみ使用してください。', 'warning-box'));
+  detail.append(element('p', i18n.t('app.21'), 'warning-box'));
   wrapper.append(header, detail);
   return wrapper;
 }
@@ -236,19 +240,19 @@ function renderRecovery() {
   if (recoveredHash === null) return;
   const hash = recoveredHash;
   if (!GitCore.isValidHash(hash)) {
-    output.append(element('p', '⚠️ 正しいSHA-1形式のハッシュを入力してください（40文字の16進数）', 'error-message'));
+    output.append(element('p', i18n.t('app.22'), 'error-message'));
     return;
   }
   const index = SAMPLE_OBJECTS.findIndex(obj => obj.hash === hash);
   if (index === -1) {
-    output.append(element('p', `オブジェクトが見つかりません: ${hash}`, 'error-message'));
-    output.append(element('p', '以下のサンプルハッシュを入力してください。'));
-    const hints = ['空のblob', 'Hello Worldを含むblob', '機密情報を含む設定ファイルのblob', 'Dockerfileのblob'];
+    output.append(element('p', i18n.t('app.23', { p0: hash }), 'error-message'));
+    output.append(element('p', i18n.t('app.24')));
+    const hints = [i18n.t('app.25'), i18n.t('app.26'), i18n.t('app.27'), i18n.t('app.28')];
     output.append(list(SAMPLE_OBJECTS.map((obj, i) => `${obj.hash} (${hints[i]})`)));
     return;
   }
   const obj = SAMPLE_OBJECTS[index];
-  output.append(element('h3', '✓ オブジェクトを復元しました', 'recovery-success'));
+  output.append(element('h3', i18n.t('app.29'), 'recovery-success'));
   const metadata = element('dl', '', 'object-metadata');
   const fields = [
     ['SHA-1', obj.hash], ['Type', obj.type], ['Size', `${obj.size} bytes`],
@@ -258,11 +262,11 @@ function renderRecovery() {
     metadata.append(element('dt', label), element('dd', value));
   });
   output.append(metadata, element('h4', 'Content'));
-  if (index === 2) output.append(element('p', '⚠️ WARNING: 機密情報が検出されました', 'error-message'));
+  if (index === 2) output.append(element('p', i18n.t('app.30'), 'error-message'));
   output.append(element('pre', obj.content || '(empty file)', 'object-content'));
-  output.append(element('p', '💡 オブジェクトは通常zlibで圧縮され、.git/objects/に保存されます。', 'simulation-notice'));
+  output.append(element('p', i18n.t('app.31'), 'simulation-notice'));
   if (index === 2) {
-    output.append(element('p', 'このようなファイルが.gitに残っていると、機密情報が漏洩する可能性があります。', 'warning-box'));
+    output.append(element('p', i18n.t('app.32'), 'warning-box'));
   }
   output.append(recoveryMethods(hash));
 }
@@ -328,11 +332,11 @@ document.addEventListener('keydown', event => {
 document.querySelectorAll('.ctf-category').forEach((category, index) => {
   const heading = category.querySelector('h3');
   if (!heading) return;
-  const title = heading.textContent;
   const content = element('div');
   content.id = 'ctf-details-' + index;
   while (heading.nextSibling) content.append(heading.nextSibling);
-  const control = button(title, () => toggleAccordion(content.id), 'ctf-accordion');
+  const control = button('', () => toggleAccordion(content.id), 'ctf-accordion');
+  control.append(...heading.childNodes);
   control.setAttribute('aria-controls', content.id);
   control.setAttribute('aria-expanded', 'true');
   heading.replaceChildren(control);
@@ -350,25 +354,29 @@ const scan = {
   timer: null
 };
 
-const scanFindings = {
-  head: ['.git/HEAD', '✅', 'HEADファイルを取得: ref: refs/heads/main', 'success', 'HEADファイル露出'],
-  config: ['.git/config', '🔍', 'リポジトリ設定を発見: リモートURL、ユーザー情報を取得', 'info', '設定ファイル漏洩'],
-  logs: ['.git/logs/HEAD', '📜', 'コミット履歴ログを発見: 過去のハッシュ値を特定', 'warning', '履歴ログ露出'],
-  refs: ['.git/refs/', '🌿', 'ブランチ情報を発見: main, develop, feature/secrets', 'info', 'ブランチ情報漏洩'],
-  objects: ['.git/objects/', '📦', 'オブジェクトファイルを発見: コミット・ツリー・blobを復元中...', 'warning', '機密ファイル復元']
+function getScanFindings() {
+  return {
+  head: ['.git/HEAD', '✅', i18n.t('app.33'), 'success', i18n.t('app.34')],
+  config: ['.git/config', '🔍', i18n.t('app.35'), 'info', i18n.t('app.36')],
+  logs: ['.git/logs/HEAD', '📜', i18n.t('app.37'), 'warning', i18n.t('app.38')],
+  refs: ['.git/refs/', '🌿', i18n.t('app.39'), 'info', i18n.t('app.40')],
+  objects: ['.git/objects/', '📦', i18n.t('app.41'), 'warning', i18n.t('app.42')]
 };
+}
+let scanFindings = getScanFindings();
+
 
 function makeScanSteps() {
-  const steps = [{ icon: '🎯', text: `対象URL: ${scan.url}`, type: 'info' }];
+  const steps = [{ icon: '🎯', text: i18n.t('app.43', { p0: scan.url }), type: 'info' }];
   Object.entries(scanFindings).forEach(([key, finding]) => {
     if (!scan.options[key]) return;
-    steps.push({ icon: '📡', text: `${scan.url.replace(/\/$/, '')}/${finding[0]} をスキャン...`, type: 'scan' });
+    steps.push({ icon: '📡', text: i18n.t('app.44', { p0: scan.url.replace(/\/$/, ''), p1: finding[0] }), type: 'scan' });
     steps.push({ icon: finding[1], text: finding[2], type: finding[3] });
     if (key === 'objects') {
-      steps.push({ icon: '💾', text: '機密ファイルを復元: .env, config.yaml, private.key', type: 'danger' });
+      steps.push({ icon: '💾', text: i18n.t('app.45'), type: 'danger' });
     }
   });
-  steps.push({ icon: '🚨', text: '警告: リポジトリ全体の復元が完了しました', type: 'danger' });
+  steps.push({ icon: '🚨', text: i18n.t('app.46'), type: 'danger' });
   return steps;
 }
 
@@ -436,33 +444,33 @@ function resetScan() {
 
 function renderScanSummary() {
   const summary = element('div', '', 'scan-summary');
-  summary.append(element('h3', '🚨 スキャン結果サマリー'));
+  summary.append(element('h3', i18n.t('app.47')));
   const risks = Object.keys(scanFindings).filter(key => scan.options[key]).map(key => scanFindings[key][4]);
   const grid = element('div', '', 'risk-summary-grid');
-  [[risks.length, '脆弱性項目'], [risks.length, '検出された問題'], ['HIGH', 'リスクレベル']].forEach(([count, title]) => {
+  [[risks.length, i18n.t('app.48')], [risks.length, i18n.t('app.49')], ['HIGH', i18n.t('app.50')]].forEach(([count, title]) => {
     const item = element('div', '', 'risk-stat');
     item.append(element('div', String(count), 'risk-number'), element('div', title, 'risk-label'));
     grid.append(item);
   });
-  summary.append(grid, element('h4', '🔍 発見された脆弱性'), list(risks));
-  summary.append(element('h4', '💥 影響範囲'));
+  summary.append(grid, element('h4', i18n.t('app.51')), list(risks));
+  summary.append(element('h4', i18n.t('app.52')));
   summary.append(list([
-    '📋 ソースコード全体の漏洩',
-    '🔑 機密情報（APIキー、パスワード）の暴露',
-    '👥 開発者の個人情報露出',
-    '🕰️ 削除済みファイルの復元',
-    '🌿 全ブランチ・タグ情報の取得'
+    i18n.t('app.53'),
+    i18n.t('app.54'),
+    i18n.t('app.55'),
+    i18n.t('app.56'),
+    i18n.t('app.57')
   ]));
-  summary.append(element('h4', '🛡️ 対策推奨事項'));
+  summary.append(element('h4', i18n.t('app.58')));
   summary.append(list([
-    'Webサーバーで/.gitディレクトリーへのアクセスを即座に拒否',
-    '本番環境から.gitディレクトリーを完全削除',
-    '漏洩した機密情報（APIキー等）の無効化・再生成',
-    'git filter-branchによる機密情報の履歴からの完全削除',
-    '定期的なセキュリティスキャンの実施'
+    i18n.t('app.59'),
+    i18n.t('app.60'),
+    i18n.t('app.61'),
+    i18n.t('app.62'),
+    i18n.t('app.63')
   ], true));
-  summary.append(element('p', '📝 これは教育用シミュレーションです。実際のWebサイトへのアクセスは行われていません。', 'simulation-notice'));
-  const reset = button('🔄 新しいスキャンを開始', resetScan);
+  summary.append(element('p', i18n.t('app.64'), 'simulation-notice'));
+  const reset = button(i18n.t('app.65'), resetScan);
   reset.id = 'reset-scan';
   summary.append(reset);
   return summary;
@@ -474,7 +482,7 @@ function updateScanControls() {
   const active = running || paused;
   const control = byId('simulate-leak');
   control.disabled = !active && !GitCore.isHttpUrl(byId('target-url').value);
-  control.textContent = running ? '⏸️ 一時停止' : paused ? '▶️ 再開' : '🚨 スキャン開始';
+  control.textContent = running ? i18n.t('app.66') : paused ? i18n.t('app.67') : i18n.t('app.68');
   control.dataset.state = scan.state;
   byId('pause-scan').hidden = !running;
   byId('resume-scan').hidden = !paused;
@@ -491,9 +499,9 @@ function renderScan() {
   output.replaceChildren();
   if (scan.state === 'idle') {
     const initial = element('div', '', 'initial-message');
-    initial.append(element('h3', '💡 使用方法'));
-    initial.append(element('p', 'URLを入力してスキャン開始を押すと、.gitディレクトリーの漏洩検査をシミュレーションします。'));
-    initial.append(element('p', 'これは教育用シミュレーターです。実際のWebサイトへのアクセスは行いません。', 'warning-box'));
+    initial.append(element('h3', i18n.t('app.69')));
+    initial.append(element('p', i18n.t('app.70')));
+    initial.append(element('p', i18n.t('app.71'), 'warning-box'));
     output.append(initial);
     return;
   }
@@ -502,9 +510,9 @@ function renderScan() {
   progress.value = scan.index;
   byId('progress-percentage').textContent = `${Math.round(scan.index / scan.steps.length * 100)}%`;
   byId('step-counter').textContent = `${scan.index} / ${scan.steps.length}`;
-  byId('progress-text').textContent = scan.state === 'paused' ? '⏸️ 一時停止中...' :
-    scan.index === scan.steps.length ? '✅ スキャン完了' : 'スキャン中...';
-  byId('current-step').textContent = scan.index === scan.steps.length ? 'すべての検査が完了しました' : scan.steps[scan.index - 1].text;
+  byId('progress-text').textContent = scan.state === 'paused' ? i18n.t('app.72') :
+    scan.index === scan.steps.length ? i18n.t('app.73') : i18n.t('app.74');
+  byId('current-step').textContent = scan.index === scan.steps.length ? i18n.t('app.75') : scan.steps[scan.index - 1].text;
   const steps = element('div', '', 'scan-progress');
   steps.id = 'leak-steps';
   scan.steps.slice(0, scan.index).forEach(step => {
@@ -539,15 +547,15 @@ document.querySelectorAll('input[name="scan-speed"]').forEach(control => {
 
 function getRiskDescription(name) {
   const risks = {
-    'HEAD': '現在のブランチ情報を含む。攻撃者はここから最新のコミットハッシュを取得可能',
-    'config': 'リモートリポジトリURL、ユーザー情報などを含む可能性',
-    'objects': 'すべてのコミット、ファイル内容、ツリー構造が圧縮保存されている',
-    'refs': 'ブランチやタグの参照情報',
-    'index': 'ステージングエリアの情報、ファイルのメタデータ',
-    'logs': 'リファレンスの更新履歴、過去のコミット情報',
-    'packed-refs': 'パックされたリファレンス情報',
-    'description': 'リポジトリの説明（GitWebなどで使用）',
-    'exclude': 'リポジトリ固有の無視パターン'
+    'HEAD': i18n.t('app.76'),
+    'config': i18n.t('app.77'),
+    'objects': i18n.t('app.78'),
+    'refs': i18n.t('app.79'),
+    'index': i18n.t('app.80'),
+    'logs': i18n.t('app.81'),
+    'packed-refs': i18n.t('app.82'),
+    'description': i18n.t('app.83'),
+    'exclude': i18n.t('app.84')
   };
 
   // ファイル名からキーを探す
@@ -559,101 +567,75 @@ function getRiskDescription(name) {
 
   // オブジェクトファイルの場合（フォルダ名が2文字の16進数、またはファイル名が38文字の16進数）
   if (name.match(/^[0-9a-f]{2}$/) || name.match(/^[0-9a-f]{38}$/)) {
-    return 'Gitオブジェクト（blob/tree/commit）が圧縮保存されている';
+    return i18n.t('app.85');
   }
 
-  return '機密情報を含む可能性があります';
+  return i18n.t('app.86');
 }
 
 // 詳細なツールチップ情報を取得する関数
 function getDetailedTooltip(name, risk) {
   const detailedInfo = {
     'HEAD': {
-      description: '現在チェックアウトされているブランチへの参照',
-      content: '例: ref: refs/heads/main',
-      attackVector: '• 最新コミットハッシュの特定\n• ブランチ構造の把握\n• 開発フローの推測',
-      countermeasures: '• .gitディレクトリーの公開禁止\n• Webサーバー設定の見直し'
+      description: i18n.t('app.87'),
+      content: i18n.t('app.88'),
+      attackVector: i18n.t('app.89'),
+      countermeasures: i18n.t('app.90')
     },
     'config': {
-      description: 'Gitリポジトリの設定情報',
-      content: '• リモートURL\n• ユーザー名・メールアドレス\n• ブランチ設定',
-      attackVector: '• 内部サーバー情報の漏洩\n• 開発者情報の特定\n• 認証情報の発見',
-      countermeasures: '• 機密情報の外部化\n• 環境変数の使用\n• .gitignoreの適切な設定'
+      description: i18n.t('app.91'),
+      content: i18n.t('app.92'),
+      attackVector: i18n.t('app.93'),
+      countermeasures: i18n.t('app.94')
     },
     'index': {
-      description: 'ステージングエリアの状態を保存',
-      content: '• ステージされたファイル一覧\n• ファイルのメタデータ\n• ハッシュ値',
-      attackVector: '• 未コミットファイルの発見\n• 削除されたファイルの復元\n• 開発中コードの漏洩',
-      countermeasures: '• 機密ファイルのステージング回避\n• 定期的なクリーンアップ'
+      description: i18n.t('app.95'),
+      content: i18n.t('app.96'),
+      attackVector: i18n.t('app.97'),
+      countermeasures: i18n.t('app.98')
     },
     'objects': {
-      description: 'すべてのGitオブジェクトを格納',
-      content: '• blob: ファイル内容\n• tree: ディレクトリー構造\n• commit: コミット情報',
-      attackVector: '• 全ファイル履歴の復元\n• 削除されたファイルの取得\n• 機密情報の発見',
-      countermeasures: '• git filter-branchでの履歴改変\n• 新リポジトリでの再作成'
+      description: i18n.t('app.99'),
+      content: i18n.t('app.100'),
+      attackVector: i18n.t('app.101'),
+      countermeasures: i18n.t('app.102')
     },
     'refs': {
-      description: 'ブランチとタグの参照情報',
-      content: '• heads/: ローカルブランチ\n• remotes/: リモートブランチ\n• tags/: タグ',
-      attackVector: '• ブランチ構造の把握\n• 開発戦略の推測\n• 隠しブランチの発見',
-      countermeasures: '• ブランチ命名規則の見直し\n• 不要ブランチの削除'
+      description: i18n.t('app.103'),
+      content: i18n.t('app.104'),
+      attackVector: i18n.t('app.105'),
+      countermeasures: i18n.t('app.106')
     },
     'logs': {
-      description: 'リファレンスの変更履歴',
-      content: '• HEAD移動の履歴\n• ブランチ切り替え記録\n• コミット・リセット履歴',
-      attackVector: '• 過去の作業内容の把握\n• 削除されたコミットの発見\n• 開発者の行動パターン分析',
-      countermeasures: '• ログの定期的なクリア\n• プライベート情報の除外'
+      description: i18n.t('app.107'),
+      content: i18n.t('app.108'),
+      attackVector: i18n.t('app.109'),
+      countermeasures: i18n.t('app.110')
     }
   };
 
   // ファイル名からキーを探す
   for (const [key, info] of Object.entries(detailedInfo)) {
     if (name.includes(key)) {
-      return `📋 ${info.description}
-
-💾 内容:
-${info.content}
-
-⚠️ 攻撃ベクター:
-${info.attackVector}
-
-🛡️ 対策:
-${info.countermeasures}`;
+      return i18n.t('app.111', { p0: info.description, p1: info.content, p2: info.attackVector, p3: info.countermeasures });
     }
   }
 
   // オブジェクトファイルの場合
   if (name.match(/^[0-9a-f]{2}$/) || name.match(/^[0-9a-f]{38}$/)) {
-    return `📦 Gitオブジェクト
-
-💾 内容:
-zlibで圧縮されたバイナリデータ
-• blob: ファイルの実際の内容
-• tree: ディレクトリー構造
-• commit: コミット情報
-
-⚠️ 攻撃ベクター:
-• ファイル内容の完全復元
-• 機密データの取得
-• 削除されたファイルの復活
-
-🛡️ 対策:
-• git filter-branchでの機密データ除去
-• 新しいリポジトリでの再構築`;
+    return i18n.t('app.112');
   }
 
   // デフォルト
-  return `⚠️ 潜在的なセキュリティリスク
-
-この要素には機密情報が含まれている可能性があります。
-.gitディレクトリーが公開されると、意図しない情報漏洩につながる恐れがあります。`;
+  return i18n.t('app.113');
 }
 
 
-const comparisonPresets = {
+function getComparisonPresets() {
+  return {
   'secure-vs-insecure': {
     left: {
-      title: '🛡️ セキュアな設定',
+      title: i18n.t('app.114'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -697,7 +679,7 @@ const comparisonPresets = {
       }
     },
     right: {
-      title: '⚠️ 危険な設定',
+      title: i18n.t('app.115'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -785,7 +767,7 @@ const comparisonPresets = {
   },
   'private-vs-public': {
     left: {
-      title: '🔒 プライベートリポジトリ',
+      title: i18n.t('app.116'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -826,7 +808,7 @@ const comparisonPresets = {
       }
     },
     right: {
-      title: '🌐 パブリックリポジトリ',
+      title: i18n.t('app.117'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -871,7 +853,7 @@ const comparisonPresets = {
   },
   'dev-vs-prod': {
     left: {
-      title: '🔧 開発環境',
+      title: i18n.t('app.118'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -923,7 +905,7 @@ const comparisonPresets = {
       }
     },
     right: {
-      title: '🚀 本番環境',
+      title: i18n.t('app.119'),
       data: {
         "name": ".git",
         "type": "folder",
@@ -987,6 +969,9 @@ const comparisonPresets = {
     }
   }
 };
+}
+let comparisonPresets = getComparisonPresets();
+
 
 
 function generateComparisonStats(leftData, rightData) {
@@ -1007,23 +992,27 @@ function generateComparisonStats(leftData, rightData) {
 }
 
 
-const presetDescriptions = {
+function getPresetDescriptions() {
+  return {
   'secure-vs-insecure': {
-    description: 'セキュリティ対策を適用した設定と、脆弱性のある危険な設定を比較します。セキュアな設定では適切な.gitignoreやhooksが設定され、機密情報の露出が最小限に抑えられています。',
-    leftDesc: 'セキュリティベストプラクティスに従った設定',
-    rightDesc: '多数の機密ファイルや履歴が露出した危険な状態'
+    description: i18n.t('app.120'),
+    leftDesc: i18n.t('app.121'),
+    rightDesc: i18n.t('app.122')
   },
   'private-vs-public': {
-    description: 'プライベートリポジトリとパブリックリポジトリの同じ内容における、セキュリティリスクの違いを比較します。同じ構造でも公開状態によってリスクレベルが大きく変わることを示しています。',
-    leftDesc: '外部からアクセス不可能なプライベート状態',
-    rightDesc: '全世界に公開されたパブリック状態'
+    description: i18n.t('app.123'),
+    leftDesc: i18n.t('app.124'),
+    rightDesc: i18n.t('app.125')
   },
   'dev-vs-prod': {
-    description: '開発環境と本番環境の.git設定を比較します。開発環境では多くのブランチや実験的なコードが含まれる一方、本番環境では厳格な管理が求められ、露出した場合の影響も深刻です。',
-    leftDesc: '開発・テスト用の柔軟な設定',
-    rightDesc: '本番運用での厳重管理が必要な重要データ'
+    description: i18n.t('app.126'),
+    leftDesc: i18n.t('app.127'),
+    rightDesc: i18n.t('app.128')
   }
 };
+}
+let presetDescriptions = getPresetDescriptions();
+
 
 
 let activePreset = null;
@@ -1049,47 +1038,47 @@ function renderComparisonTree(node, otherNode, prefix = '', isLast = true, depth
 
 function renderComparisonReport(stats, leftTitle, rightTitle) {
   const panel = element('div');
-  panel.append(element('h3', '📊 比較分析表'));
+  panel.append(element('h3', i18n.t('app.129')));
   const scroller = element('div', '', 'comparison-table-container');
   const table = element('table', '', 'comparison-table');
   const head = element('thead');
   const headings = element('tr');
-  ['項目', leftTitle, rightTitle].forEach(label => headings.append(element('th', label)));
+  [i18n.t('app.130'), leftTitle, rightTitle].forEach(label => headings.append(element('th', label)));
   head.append(headings);
   const body = element('tbody');
   const leftTotal = stats.left.high + stats.left.medium + stats.left.low;
   const rightTotal = stats.right.high + stats.right.medium + stats.right.low;
   const rows = [
-    ['💥 高リスク要素', stats.left.high, stats.right.high],
-    ['💣 中リスク要素', stats.left.medium, stats.right.medium],
-    ['⚠️ 低リスク要素', stats.left.low, stats.right.low],
-    ['🎯 総リスク要素', leftTotal, rightTotal],
-    ['📄 ファイル数', stats.left.files, stats.right.files],
-    ['📁 フォルダー数', stats.left.folders, stats.right.folders],
-    ['📊 総アイテム数', stats.left.files + stats.left.folders, stats.right.files + stats.right.folders]
+    [i18n.t('app.131'), stats.left.high, stats.right.high],
+    [i18n.t('app.132'), stats.left.medium, stats.right.medium],
+    [i18n.t('app.133'), stats.left.low, stats.right.low],
+    [i18n.t('app.134'), leftTotal, rightTotal],
+    [i18n.t('app.135'), stats.left.files, stats.right.files],
+    [i18n.t('app.136'), stats.left.folders, stats.right.folders],
+    [i18n.t('app.137'), stats.left.files + stats.left.folders, stats.right.files + stats.right.folders]
   ];
   rows.forEach(([label, left, right], index) => {
     const row = element('tr');
     row.append(element('td', label));
     const leftClass = index < 4 && left !== right ? left > right ? 'higher-risk' : 'lower-risk' : '';
     const rightClass = index < 4 && left !== right ? right > left ? 'higher-risk' : 'lower-risk' : '';
-    row.append(element('td', `${left}個`, leftClass), element('td', `${right}個`, rightClass));
+    row.append(element('td', i18n.t('app.138', { p0: left }), leftClass), element('td', i18n.t('app.139', { p0: right }), rightClass));
     body.append(row);
   });
   table.append(head, body);
   scroller.append(table);
   panel.append(scroller);
   const recommendation = element('div', '', 'recommendation');
-  recommendation.append(element('h4', '💡 推奨事項'));
-  const message = leftTotal === rightTotal ? '両方の構造のセキュリティリスクレベルは同等です。' :
-    `${leftTotal < rightTotal ? leftTitle : rightTitle} の方がセキュリティリスクが低く、より安全です。`;
+  recommendation.append(element('h4', i18n.t('app.140')));
+  const message = leftTotal === rightTotal ? i18n.t('app.141') :
+    i18n.t('app.142', { p0: leftTotal < rightTotal ? leftTitle : rightTitle });
   recommendation.append(element('p', message));
-  recommendation.append(element('p', 'セキュリティを向上させるには'));
+  recommendation.append(element('p', i18n.t('app.143')));
   recommendation.append(list([
-    '.gitディレクトリーのWeb公開を防ぐ',
-    '機密情報を含むファイルの履歴からの完全削除',
-    '適切な.gitignore設定の実装',
-    '定期的なセキュリティスキャンの実行'
+    i18n.t('app.144'),
+    i18n.t('app.145'),
+    i18n.t('app.146'),
+    i18n.t('app.147')
   ]));
   panel.append(recommendation);
   return panel;
@@ -1111,7 +1100,7 @@ function loadPresetComparison(presetKey) {
   });
   const report = byId('comparison-report');
   const intro = element('div', '', 'comparison-description');
-  intro.append(element('h3', '📝 比較の概要'), element('p', description.description));
+  intro.append(element('h3', i18n.t('app.148')), element('p', description.description));
   report.replaceChildren(intro, renderComparisonReport(
     generateComparisonStats(preset.left.data, preset.right.data), preset.left.title, preset.right.title
   ));
@@ -1123,3 +1112,24 @@ document.querySelectorAll('.preset-button').forEach(control => {
 
 loadGitStructure();
 renderScan();
+
+
+byId('language-button').addEventListener('click', () => {
+  i18n.setLanguage(i18n.language === 'ja' ? 'en' : 'ja');
+});
+
+i18n.onChange(() => {
+  const methodWasOpen = byId('method-details') && !byId('method-details').hidden;
+  sampleDescriptions = getSampleDescriptions();
+  scanFindings = getScanFindings();
+  comparisonPresets = getComparisonPresets();
+  presetDescriptions = getPresetDescriptions();
+  loadGitStructure();
+  renderRecovery();
+  if (methodWasOpen && byId('method-details')) toggleAccordion('method-details');
+  if (scan.steps.length) scan.steps = makeScanSteps();
+  renderScan();
+  if (activePreset) loadPresetComparison(activePreset);
+  const toast = byId('copy-feedback');
+  if (toast) toast.textContent = i18n.translateRendered(toast.textContent);
+});

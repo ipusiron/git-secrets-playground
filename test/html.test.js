@@ -12,7 +12,7 @@ test('strict CSP, referrer and scripting fallback', () => {
     "object-src 'none'; base-uri 'none'; form-action 'none'");
   assert.doesNotMatch(csp, /unsafe-inline|frame-ancestors/);
   assert.match(html, /name="referrer" content="no-referrer"/);
-  assert.match(html, /<noscript>/);
+  assert.match(html, /<noscript\b[^>]*>/);
 });
 
 test('markup has no inline execution or presentation', () => {
