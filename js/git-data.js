@@ -1,4 +1,6 @@
-{
+'use strict';
+
+const GIT_STRUCTURE = {
   "name": ".git",
   "type": "folder",
   "children": [
@@ -29,17 +31,17 @@
           ]
         },
         { 
-          "name": "4b", 
+          "name": "3b",
           "type": "folder",
           "children": [
-            { "name": "825dc642cb6eb9a060e54bf8d69288fbee4904", "type": "file", "risk": "high" }
+            { "name": "b8dc0bbcd57a209018a4aa1c6d07db2edc75dd", "type": "file", "risk": "high" }
           ]
         },
         { 
-          "name": "89", 
+          "name": "df",
           "type": "folder",
           "children": [
-            { "name": "e6c98cbe0ffaa2f1ce9e8c19ca7ee4ad51eb42", "type": "file", "risk": "high" }
+            { "name": "799688ee42b4d33e495ffa1a78469753c7dde9", "type": "file", "risk": "high" }
           ]
         }
       ]
@@ -117,4 +119,55 @@
       ]
     }
   ]
-}
+};
+
+const SAMPLE_OBJECTS = [
+  {
+    hash: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+    type: 'blob',
+    size: 0,
+    content: '',
+    descriptionKey: 'sample.empty'
+  },
+  {
+    hash: '557db03de997c86a4a028e1ebd3a1ceb225be238',
+    type: 'blob',
+    size: 12,
+    content: 'Hello World\n',
+    descriptionKey: 'sample.hello'
+  },
+  {
+    hash: '3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd',
+    type: 'blob',
+    size: 169,
+    content: `# Project Configuration
+version: 1.0.0
+database:
+  host: localhost
+  username: admin
+  password: secret123
+api_keys:
+  stripe: sk_test_abc123def456
+  sendgrid: SG.xyz789`,
+    descriptionKey: 'sample.config'
+  },
+  {
+    hash: 'df799688ee42b4d33e495ffa1a78469753c7dde9',
+    type: 'blob',
+    size: 263,
+    content: `FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y \\
+    python3 \\
+    python3-pip \\
+    nginx
+COPY requirements.txt /app/
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+COPY . /app/
+EXPOSE 8000
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]`,
+    descriptionKey: 'sample.docker'
+  }
+];
+
+if (typeof module !== 'undefined' && module.exports) module.exports = { GIT_STRUCTURE, SAMPLE_OBJECTS };

@@ -1,0 +1,7 @@
+{
+  "name": "git-secrets-playground",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
