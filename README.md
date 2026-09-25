@@ -384,6 +384,7 @@ git-secrets-playground/           # プロジェクトルート
 │   └── screenshot3.png           # 英語のリーク検査の結果
 ├── js/                           # file://でも動くclassic script
 │   ├── git-core.js               # ハッシュ・置き場所・集計・URLの純粋関数
+│   ├── scenario-data.js          # 本物のGitから採取した履歴調査のデータ
 │   ├── git-data.js               # .git構造と正しいハッシュのサンプル
 │   ├── app.js                    # 5タブ・スキャン・比較・ヘルプの処理
 │   └── i18n.js                   # 日英の辞書・ヘルプ・CTFヒント・切り替え

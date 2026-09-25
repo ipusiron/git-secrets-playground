@@ -355,6 +355,7 @@ git-secrets-playground/           # Project root
 │   └── screenshot3.png           # Leak scan results in English
 ├── js/                           # Classic scripts compatible with file://
 │   ├── git-core.js               # Pure hash, path, statistics, and URL functions
+│   ├── scenario-data.js          # Investigation data captured from real Git
 │   ├── git-data.js               # .git structure and samples with verified hashes
 │   ├── app.js                    # Five tabs, scan state, comparison, and help
 │   └── i18n.js                   # Japanese/English dictionaries, help, CTF hints, and switching
