@@ -8,8 +8,8 @@ title: "Git Secrets Playground"
 subtitle_ja: "Git情報漏洩シミュレーター"
 subtitle_en: "Git Information Leak Simulator"
 
-description_ja: ".gitディレクトリーが外部に公開された際の情報漏洩リスクを疑似体験できる教育用シミュレーター。構造ビューアー、オブジェクト復元、リーク検査、構造比較、CTFヒントの5つのモードを搭載。"
-description_en: "An educational simulator that demonstrates the security risks when .git directories are exposed. Features 5 modes: Structure Viewer, Object Recovery, Leak Inspector, Structure Compare, and CTF Hints."
+description_ja: ".gitディレクトリーの情報漏洩リスクを体験する教育用シミュレーター。6つのタブで、履歴に残る秘密の調査と本物のGitオブジェクトの計算・解凍を体験。"
+description_en: "An educational simulator of exposed .git directories with six tabs, history investigation, and real Git object hashing and decompression."
 
 category_ja:
   - フォレンジック
@@ -48,7 +48,7 @@ English: [README.en.md](README.en.md)
 
 「`.git`ディレクトリーが外部に公開されたとき、何が漏れるのか？」
 
-**Git Secrets Playground**はその疑似体験を通じて、Gitリポジトリーの構造とセキュリティリスクを学ぶ教育用シミュレーターです。日本語・英語に対応し、5つのタブをfile://でも利用できます。
+**Git Secrets Playground**はその疑似体験を通じて、Gitリポジトリーの構造とセキュリティリスクを学ぶ教育用シミュレーターです。日本語・英語に対応し、6つのタブをfile://でも利用できます。
 
 ## 🌐 デモページ
 
@@ -70,6 +70,16 @@ English: [README.en.md](README.en.md)
 
 *英語でスキップ完了したリーク検査の結果（1280×1000、234,199バイト）。*
 
+![履歴から削除済み設定を調査](assets/screenshot4.png)
+
+*日本語の履歴調査。以前のconfig.ymlに残るTr0ub4dor-3とファイル名のハッシュ一致（1280×1000、123,392バイト）。*
+
+![本物の計算](assets/screenshot5.png)
+
+*英語の実計算。Hello Worldと改行のハッシュ557db03d…・見出し・zlib圧縮結果（1280×1000、41,780バイト）。*
+
+最初の3枚は第1弾の画面を保持しています。新規2枚は第2弾の画面です。
+
 ---
 
 ## ✨ 機能
@@ -87,6 +97,9 @@ English: [README.en.md](README.en.md)
 - **手動入力**: 40桁のSHA-1ハッシュを入力し、既知の4種類のblobだけを復元
 - **復元結果表示**: オブジェクトタイプ、サイズ、内容を詳細表示
 - **教育情報**: zlibによる圧縮やGitオブジェクトの仕組みを解説
+- **本物の計算**: UTF-8の中身からblobのSHA-1・見出し・置き場所・zlib圧縮を計算
+- **逆変換**: 圧縮ファイルの16進数を解凍し、blob・tree・commitを表示
+- **サンプル照合**: 従来の4サンプルも中身からSHA-1を計算して一致を確認
 
 ### 🚨 リーク検査（シミュレーション）
 - **URL入力**: 検査対象URLの設定（プリセットボタンも利用可能）
@@ -106,6 +119,14 @@ English: [README.en.md](README.en.md)
 - **並列表示**: 2つの構造を左右に並べて視覚的に比較
 - **比較分析表**: リスクレベル別の要素数を数値で比較
 - **推奨事項**: セキュリティ向上のための具体的なアドバイス
+
+### 🕵️ 履歴の調査
+
+- 本物のGitで作った2コミット・7オブジェクトを同梱
+- HEAD・refs・logsとオブジェクトを開き、実際の解凍・SHA-1照合で履歴を調査
+- 親コミットのtreeから削除済みconfig.ymlを発見する演習
+- 3段のヒント・答え合わせ・漏洩後の対策
+- 言語切り替えでも開いたファイル・取得済みの印・ヒント・答えを保持。調査内容は保存しない
 
 ### 🚩 CTFヒント
 - **基本調査手順**: `.git`ディレクトリー発見から情報収集までの手順
@@ -154,16 +175,18 @@ English: [README.en.md](README.en.md)
 ### 🎮 基本操作
 
 1. **❓ ヘルプボタン**: ツール名右側の❓ボタンで全機能の詳細説明を表示
-2. **タブ切り替え**: 上部のタブボタンで5つの機能を切り替え
+2. **タブ切り替え**: 上部のタブボタンで6つの機能を切り替え
 3. **📁 構造ビューアー**: フォルダーをクリックして展開/折りたたみ
 4. **🚨 リーク検査**: URL入力後、速度を選択してスキャン実行
 5. **⚖️ 構造比較**: プリセットボタンで異なる環境を比較
+6. **🕵️ 履歴の調査**: HEAD→refs→commit→parent→tree→config.ymlのblobを開き、解凍して秘密を探す
+7. **🧮 本物の計算**: オブジェクト復元タブで中身を入力して計算。出力の圧縮16進数を下の欄へ貼って解凍
 
 ### 💡 よくある質問
 
 **Q: ローカルサーバーは必要ですか？**
 
-A: 不要です。構造データは同梱のJavaScriptから読み込むため、file://でも5タブすべてが動きます。
+A: 不要です。構造データは同梱のJavaScriptから読み込むため、file://でも6タブすべてが動きます。
 
 **Q: リーク検査で実際にWebサイトにアクセスしますか？**
 A: いいえ。完全にシミュレーションです。実際の外部アクセスは一切行いません。
@@ -191,7 +214,35 @@ Gitのblobのハッシュは、UTF-8の中身の前に`blob <バイト数>\0`を
 
 ツリーは37項目（ファイル19・フォルダー18）で、HIGHが10、MEDIUMが7、LOWが3です。サンプルの中身は変更していません。
 
-復元は4種類の固定blobを引くシミュレーションです。画面上で本物のSHA-1計算・zlib解凍や任意のリポジトリーの復元は行わず、リーク検査も入力URLへ通信しません。数値はテストでNodeの暗号機能から再計算します。
+従来の復元欄は4種類の固定blobを選び、中身からSHA-1を実計算して照合します。履歴調査と本物の計算ではzlibの解凍も行います。任意のリポジトリー全体の取得・pack解析・外部URLへの通信は行いません。
+
+---
+
+### 履歴の調査のデータ
+
+本物のGitで、作成者Dev Exampleと日時を固定した2コミットのリポジトリーを作り、出力をそのまま同梱しています。秘密は演習用の偽物です。
+
+| ハッシュ | 種類 | サイズ | 中身の要約 |
+|---|---|---|---|
+| `053b492e8d60d6e8b50152bb2dbbf62b44d5b1ca` | blob | 66 | `# Demo App` |
+| `863230c82209c78e1ba0e7a61304f5197f00a77e` | commit | 173 | `Add app config` |
+| `8b056784a6207580608f107a09abadaf5f6c2af1` | blob | 93 | `database:` |
+| `8cc967668c1a14b8f82064478caf03defd7cfd34` | tree | 75 | `README.md, config.yml` |
+| `b4719a20b17d401cc15d2321f34768f860aa8755` | blob | 104 | `database:` |
+| `d75f7af7e09183ce60c816274fa5e8d9e15e1fb7` | commit | 233 | `Remove secrets from config` |
+| `e9c014bf835507e6cc16b14ec2926f589480d847` | tree | 75 | `README.md, config.yml` |
+
+たどる順番は`.git/HEAD`→`.git/refs/heads/main`→commit `d75f7af7…`→parent `863230c8…`→tree `8cc96766…`→config.ymlのblob `b4719a20…`です。パスワードは`Tr0ub4dor-3`、APIキーは`DEMO-KEY-NOT-REAL-7f3a9c`です。現在のtree `e9c014bf…`が指す設定blob `8b056784…`には、環境変数の参照だけが残っています。
+
+日時は最初のコミットが2026-04-01 10:00:00 +0900、次が2026-04-02 09:30:00 +0900です。記録のタイムゾーンで表示し、ブラウザー側の設定に左右されません。
+
+### 本物の計算
+
+`<種類> <UTF-8のバイト数>\0<中身>`からSHA-1を計算し、その全体をzlibで圧縮します。Hello Worldと改行は12バイトで`557db03de997c86a4a028e1ebd3a1ceb225be238`、空のblobは`e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`です。圧縮後のバイト列は設定によって変わるため、Gitの出力と完全一致するとは限りません。
+
+入力上限はUTF-8で64 KB、圧縮データは空白を除いた16進数文字列で128 KBです。末尾の改行追加は既定オンで、空blobを作るときは外します。解凍時は任意の期待ハッシュとも照合できます。不正な16進数・zlib・見出し・サイズには案内を表示します。
+
+`crypto.subtle`は安全な文脈でのみ使えます。https・file://・localhostの現行ブラウザーを使用してください。`crypto.subtle`・`CompressionStream`・`DecompressionStream`のいずれかがない場合は、新機能の案内を表示して操作を無効にします。既存の4サンプルは計算できない旨を添えて表示できます。
 
 ---
 
@@ -351,12 +402,12 @@ npm test
 
 | ファイル | 検査 |
 |---|---|
-| core.test.js | 本物のblobのSHA-1・UTF-8サイズ・置き場所・集計・URL |
+| core.test.js | 本物のblob・7オブジェクト・履歴の到達・100本のzlib往復・例外・集計・URL |
 | i18n.test.js | 辞書のキー・空値・使用キー・日本語の直書き |
 | html.test.js | CSP・ARIA・ラベル・外部リンク・禁止API |
 | contrast.test.js | 指定色の文字コントラスト4.5:1以上 |
 | format.test.js | 行数の下限と行の長さ |
-| readme.test.js | 日英の既知解答・YAML・ファイルツリー・見出し・画像 |
+| readme.test.js | 日英の4サンプルと7オブジェクト・YAML・ツリー・見出し・5画像 |
 
 サンプルの中身が変わっていないことは、元のコミット`bbecd38`のソースとも比較します。浅いクローンの場合は、その履歴を取得してから実行してください。
 
@@ -376,16 +427,19 @@ git-secrets-playground/           # プロジェクトルート
 ├── README.md                     # 日本語の使い方・仕様・既知解答・テスト
 ├── README.en.md                  # 同じ節構成の英語版README
 ├── package.json                  # 依存なしのnpm test（node --test）
-├── index.html                    # 5タブ・ヘルプ・meta CSP
+├── index.html                    # 6タブ・ヘルプ・meta CSP
 ├── style.css                     # 配色変数・レスポンシブ・アニメーション
 ├── assets/                       # README用の画像
 │   ├── screenshot.png            # 構造ビューアーの統計とリスクの色分け
 │   ├── screenshot2.png           # 機密設定ファイルのサンプル復元
-│   └── screenshot3.png           # 英語のリーク検査の結果
+│   ├── screenshot3.png           # 英語のリーク検査の結果
+│   ├── screenshot4.png           # 履歴から削除済み設定を開きハッシュ一致を確認
+│   └── screenshot5.png           # 英語のHello Worldの実計算とzlib圧縮結果
 ├── js/                           # file://でも動くclassic script
-│   ├── git-core.js               # ハッシュ・置き場所・集計・URLの純粋関数
+│   ├── git-core.js               # SHA-1・zlib・オブジェクト解析・集計・URL
+│   ├── scenario-data.js          # 本物のGitから採取した履歴調査のデータ
 │   ├── git-data.js               # .git構造と正しいハッシュのサンプル
-│   ├── app.js                    # 5タブ・スキャン・比較・ヘルプの処理
+│   ├── app.js                    # 6タブ・実計算・履歴調査・スキャン・ヘルプ
 │   └── i18n.js                   # 日英の辞書・ヘルプ・CTFヒント・切り替え
 └── test/                         # node --testによる自動テスト
     ├── core.test.js              # 中核・データ・サンプルのSHA-1再計算

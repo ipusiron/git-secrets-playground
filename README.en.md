@@ -12,7 +12,7 @@
 
 What leaks when a `.git` directory is publicly accessible?
 
-**Git Secrets Playground** is an educational simulator for exploring Git repository structure and exposure risks. All five tabs work locally through file://, with Japanese and English interfaces.
+**Git Secrets Playground** is an educational simulator for exploring Git repository structure and exposure risks. All six tabs work locally through file://, with Japanese and English interfaces.
 
 ---
 
@@ -36,6 +36,16 @@ What leaks when a `.git` directory is publicly accessible?
 
 *English leak scan results after skipping to completion (1280×1000, 234,199 bytes).*
 
+![Investigating deleted configuration](assets/screenshot4.png)
+
+*Japanese history investigation: Tr0ub4dor-3 in the previous config.yml and a matching filename hash (1280×1000, 123,392 bytes).*
+
+![Real calculations](assets/screenshot5.png)
+
+*English calculation of Hello World with a newline: hash 557db03d…, header, and zlib-compressed output (1280×1000, 41,780 bytes).*
+
+The first three images preserve the first release. The two new images show the second release.
+
 ---
 
 ## ✨ Features
@@ -55,6 +65,9 @@ What leaks when a `.git` directory is publicly accessible?
 - Manual entry of a 40-digit SHA-1 hash; only the four known blobs can be recovered
 - Results showing object type, size, path, description, and content
 - Educational explanations of zlib compression and Git objects
+- Real calculation of a blob SHA-1, header, path, and zlib compression from UTF-8 content
+- Reverse conversion of compressed hexadecimal data into blob, tree, or commit content
+- SHA-1 verification computed from the content of all four original samples
 
 ### 🚨 Leak Inspector (simulation)
 
@@ -71,6 +84,14 @@ What leaks when a `.git` directory is publicly accessible?
 - Side-by-side directory structures
 - A comparison table of risk counts
 - Recommendations explaining the differences
+
+### 🕵️ History Investigation
+
+- Two commits and seven objects created with real Git and bundled locally
+- HEAD, refs, logs, and object retrieval with actual decompression and SHA-1 verification
+- An exercise to find deleted config.yml content through the parent commit's tree
+- Three hints, answer checking, and post-exposure countermeasures
+- Language switching preserves the opened file, retrieval marks, hints, and answer; investigation data is not persisted
 
 ### 🚩 CTF Hints
 
@@ -117,16 +138,18 @@ What leaks when a `.git` directory is publicly accessible?
 ### 🎮 Basic operations
 
 1. Use the help button to the right of the title for detailed explanations.
-2. Select one of the five tabs.
+2. Select one of the six tabs.
 3. Expand or collapse folders in Structure Viewer.
 4. Enter a URL and choose a speed in Leak Inspector.
 5. Select presets in Structure Compare.
+6. Follow HEAD → refs → commit → parent → tree → config.yml blob in History Investigation, decompressing objects to find the secret.
+7. Enter content in Real calculations within Object Recovery; paste the compressed hex output into the lower form to decompress it.
 
 ### 💡 Frequently asked questions
 
 **Q: Do I need a local server?**
 
-A: No. Tree data is included in JavaScript, so all five tabs work over file://.
+A: No. Tree data is included in JavaScript, so all six tabs work over file://.
 
 **Q: Does the leak scan access a real website?**
 
@@ -157,7 +180,35 @@ The previous configuration sample incorrectly used the empty-tree hash `4b825dc6
 
 The tree contains 37 entries: 19 files and 18 folders, with 10 HIGH, 7 MEDIUM, and 3 LOW risk entries. The sample content has not changed.
 
-Recovery is a lookup of four fixed blob samples. The browser does not calculate real SHA-1 hashes, decompress zlib data, or recover arbitrary repositories, and the scan never connects to the supplied URL. Tests independently recompute the values using Node's crypto module.
+The original recovery form selects four fixed blobs and verifies SHA-1 from their content. Investigation and Real calculations also decompress zlib objects. The tool does not retrieve arbitrary repositories, parse pack files, or connect to external targets.
+
+---
+
+### Investigation Data
+
+A real Git repository with two commits was created using a fixed author (Dev Example) and timestamps. Its output is bundled unchanged. All secrets are fictional exercise data.
+
+| Hash | Type | Size | Content summary |
+|---|---|---|---|
+| `053b492e8d60d6e8b50152bb2dbbf62b44d5b1ca` | blob | 66 | `# Demo App` |
+| `863230c82209c78e1ba0e7a61304f5197f00a77e` | commit | 173 | `Add app config` |
+| `8b056784a6207580608f107a09abadaf5f6c2af1` | blob | 93 | `database:` |
+| `8cc967668c1a14b8f82064478caf03defd7cfd34` | tree | 75 | `README.md, config.yml` |
+| `b4719a20b17d401cc15d2321f34768f860aa8755` | blob | 104 | `database:` |
+| `d75f7af7e09183ce60c816274fa5e8d9e15e1fb7` | commit | 233 | `Remove secrets from config` |
+| `e9c014bf835507e6cc16b14ec2926f589480d847` | tree | 75 | `README.md, config.yml` |
+
+Follow `.git/HEAD` → `.git/refs/heads/main` → commit `d75f7af7…` → parent `863230c8…` → tree `8cc96766…` → config.yml blob `b4719a20…`. The password is `Tr0ub4dor-3` and the API key is `DEMO-KEY-NOT-REAL-7f3a9c`. The current tree `e9c014bf…` points to configuration blob `8b056784…`, containing only environment-variable references.
+
+The initial commit is dated 2026-04-01 10:00:00 +0900 and the next 2026-04-02 09:30:00 +0900. Dates use the recorded offset, independent of the browser's timezone.
+
+### Real Calculations
+
+SHA-1 is calculated over `<type> <UTF-8 byte count>\0<content>`, and that full byte sequence is compressed with zlib. Hello World plus a newline contains 12 bytes and hashes to `557db03de997c86a4a028e1ebd3a1ceb225be238`; the empty blob hashes to `e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`. Compressed bytes depend on settings and need not exactly match Git's output.
+
+Limits are 64 KB of UTF-8 content and 128 KB of hexadecimal characters after whitespace removal. Appending a newline is enabled by default; uncheck it for an empty blob. Decompression can compare an optional expected hash. Invalid hex, zlib, headers, or sizes produce explanatory messages.
+
+`crypto.subtle` requires a secure context. Use a modern browser via https, file://, or localhost. If `crypto.subtle`, `CompressionStream`, or `DecompressionStream` is unavailable, a notice appears and new operations are disabled. The original four samples remain viewable with a calculation-unavailable notice.
 
 ---
 
@@ -322,12 +373,12 @@ No package installation is required. GitHub Actions runs the suite on Node 22 fo
 
 | File | Checks |
 |---|---|
-| core.test.js | Real blob SHA-1, UTF-8 size, path, statistics, and URL validation |
+| core.test.js | Real blobs, seven objects, history traversal, 100 zlib round trips, errors, statistics, and URLs |
 | i18n.test.js | Dictionary keys, empty values, used keys, and Japanese literals |
 | html.test.js | CSP, ARIA, labels, external links, and forbidden APIs |
 | contrast.test.js | Text contrast of at least 4.5:1 for specified colors |
 | format.test.js | Minimum line counts and maximum line lengths |
-| readme.test.js | Known answers, YAML, file tree, headings, and image references |
+| readme.test.js | Four samples and seven objects in both languages, YAML, tree, headings, and five images |
 
 Sample contents are also compared with the source at the original commit `bbecd38`. Fetch that history before testing a shallow clone.
 
@@ -347,16 +398,19 @@ git-secrets-playground/           # Project root
 ├── README.md                     # Japanese usage, specification, known answers, and tests
 ├── README.en.md                  # English README with matching sections
 ├── package.json                  # Dependency-free npm test (node --test)
-├── index.html                    # Five tabs, help, and meta CSP
+├── index.html                    # Six tabs, help, and meta CSP
 ├── style.css                     # Color variables, responsive layout, and animation
 ├── assets/                       # README images
 │   ├── screenshot.png            # Structure statistics and risk colors
 │   ├── screenshot2.png           # Sensitive configuration sample recovery
-│   └── screenshot3.png           # Leak scan results in English
+│   ├── screenshot3.png           # Leak scan results in English
+│   ├── screenshot4.png           # Deleted configuration and matching filename hash
+│   └── screenshot5.png           # English Hello World calculation and zlib output
 ├── js/                           # Classic scripts compatible with file://
-│   ├── git-core.js               # Pure hash, path, statistics, and URL functions
+│   ├── git-core.js               # SHA-1, zlib, object parsing, statistics, and URLs
+│   ├── scenario-data.js          # Investigation data captured from real Git
 │   ├── git-data.js               # .git structure and samples with verified hashes
-│   ├── app.js                    # Five tabs, scan state, comparison, and help
+│   ├── app.js                    # Six tabs, calculation, investigation, scan, and help
 │   └── i18n.js                   # Japanese/English dictionaries, help, CTF hints, and switching
 └── test/                         # Automated tests using node --test
     ├── core.test.js              # Core, data, and sample SHA-1 recomputation

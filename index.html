@@ -25,6 +25,8 @@
       <button type="button" class="tab-button" data-tab="objects" id="tab-objects" role="tab" aria-controls="objects" aria-selected="false" tabindex="-1"><span data-i18n="html.6">オブジェクト復元</span></button>
       <button type="button" class="tab-button" data-tab="leak" id="tab-leak" role="tab" aria-controls="leak" aria-selected="false" tabindex="-1"><span data-i18n="html.7">リーク検査</span></button>
       <button type="button" class="tab-button" data-tab="compare" id="tab-compare" role="tab" aria-controls="compare" aria-selected="false" tabindex="-1"><span data-i18n="html.8">構造比較</span></button>
+      <button type="button" class="tab-button" data-tab="investigation" id="tab-investigation" role="tab"
+        aria-controls="investigation" aria-selected="false" tabindex="-1" data-i18n="invest.title">🕵️ 履歴の調査</button>
       <button type="button" class="tab-button" data-tab="ctf" id="tab-ctf" role="tab" aria-controls="ctf" aria-selected="false" tabindex="-1"><span data-i18n="html.9">CTFヒント</span></button>
     </nav>
   </header>
@@ -75,6 +77,24 @@
         </div>
       </div>
       <div id="object-output"></div>
+      <section id="real-calculation" class="calculation">
+        <h3 data-i18n="calc.title">🧮 本物の計算</h3>
+        <p id="calc-unavailable" class="error-message" data-i18n="object.unavailable" hidden></p>
+        <h4 data-i18n="calc.encode">中身からハッシュを作る</h4>
+        <label for="calc-text" data-i18n="calc.text"></label>
+        <textarea id="calc-text" rows="4"></textarea>
+        <label class="calc-checkbox"><input type="checkbox" id="calc-newline" checked><span data-i18n="calc.newline"></span></label>
+        <button type="button" id="calc-create" data-i18n="calc.calculate">計算する</button>
+        <div id="calc-created" aria-live="polite"></div>
+        <p data-i18n="calc.note"></p>
+        <h4 data-i18n="calc.decode">.git/objects のファイルを読む</h4>
+        <label for="calc-input-hex" data-i18n="calc.inputHex"></label>
+        <textarea id="calc-input-hex" rows="4"></textarea>
+        <label for="calc-expected" data-i18n="calc.expected"></label>
+        <input type="text" id="calc-expected" autocomplete="off">
+        <button type="button" id="calc-read" data-i18n="calc.decompress">解凍する</button>
+        <div id="calc-decoded" aria-live="polite"></div>
+      </section>
     </section>
 
     <!-- リーク検査 -->
@@ -88,9 +108,9 @@
           <div class="url-input-container">
             <input type="text" id="target-url" placeholder="https://example.com">
             <div class="preset-urls">
-              <button type="button" class="preset-url-btn" data-url="https://vulnerable-site.com"><span data-i18n="html.30">脆弱サイト例</span></button>
-              <button type="button" class="preset-url-btn" data-url="https://dev.company.com"><span data-i18n="html.31">開発サーバー例</span></button>
-              <button type="button" class="preset-url-btn" data-url="https://staging.webapp.io"><span data-i18n="html.32">ステージング例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://vulnerable.example"><span data-i18n="html.30">脆弱サイト例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://dev.example.com"><span data-i18n="html.31">開発サーバー例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://staging.example.org"><span data-i18n="html.32">ステージング例</span></button>
             </div>
           </div>
         </div>
@@ -258,7 +278,7 @@
               <div class="step-content">
                 <h4><span data-i18n="html.72">.gitディレクトリーの存在確認</span></h4>
                 <div class="code-block">
-                  <code>curl -I https://target.com/.git/HEAD</code>
+                  <code>curl -I https://target.example/.git/HEAD</code>
                 </div>
                 <p><span data-i18n="html.73">200 OKが返れば.gitディレクトリーが公開されている</span></p>
               </div>
@@ -269,8 +289,8 @@
               <div class="step-content">
                 <h4><span data-i18n="html.74">基本情報の取得</span></h4>
                 <div class="code-block">
-                  <code>curl https://target.com/.git/config<br>
-                  curl https://target.com/.git/HEAD</code>
+                  <code>curl https://target.example/.git/config<br>
+                  curl https://target.example/.git/HEAD</code>
                 </div>
                 <p><span data-i18n="html.75">リポジトリー設定と現在のブランチ情報を確認</span></p>
               </div>
@@ -281,8 +301,8 @@
               <div class="step-content">
                 <h4><span data-i18n="html.76">コミット履歴の探索</span></h4>
                 <div class="code-block">
-                  <code>curl https://target.com/.git/logs/HEAD<br>
-                  curl https://target.com/.git/logs/refs/heads/main</code>
+                  <code>curl https://target.example/.git/logs/HEAD<br>
+                  curl https://target.example/.git/logs/refs/heads/main</code>
                 </div>
                 <p><span data-i18n="html.77">過去のコミットハッシュとメッセージを取得</span></p>
               </div>
@@ -296,7 +316,7 @@
             <div class="tool-item">
               <h4>📦 GitHacker</h4>
               <div class="code-block">
-                <code>python GitHacker.py --url https://target.com/.git/ --folder result</code>
+                <code>python GitHacker.py --url https://target.example/.git/ --folder result</code>
               </div>
               <p><span data-i18n="html.79">自動で.gitディレクトリーをダウンロードしてリポジトリーを復元</span></p>
             </div>
@@ -304,7 +324,7 @@
             <div class="tool-item">
               <h4>🔧 git-dumper</h4>
               <div class="code-block">
-                <code>git-dumper https://target.com/.git/ /tmp/repo</code>
+                <code>git-dumper https://target.example/.git/ /tmp/repo</code>
               </div>
               <p><span data-i18n="html.80">部分的に公開された.gitディレクトリーからファイルを復元</span></p>
             </div>
@@ -312,7 +332,7 @@
             <div class="tool-item">
               <h4>🌐 Wayback Machine</h4>
               <div class="code-block">
-                <code>https://web.archive.org/web/*/https://target.com/.git/</code>
+                <code>https://web.archive.org/web/*/https://target.example/.git/</code>
               </div>
               <p><span data-i18n="html.81">過去のスナップショットから削除された.gitファイルを発見</span></p>
             </div>
@@ -417,6 +437,37 @@
         </div>
       </div>
     </section>
+    <section id="investigation" class="tab-content" role="tabpanel" aria-labelledby="tab-investigation">
+      <h2 data-i18n="invest.title">🕵️ 履歴の調査</h2>
+      <p data-i18n="invest.intro"></p>
+      <p class="simulation-notice" data-i18n="invest.notice"></p>
+      <p id="invest-unavailable" class="error-message" data-i18n="object.unavailable" hidden></p>
+      <div class="invest-layout">
+        <div>
+          <h3 data-i18n="invest.files">取り出せるファイル</h3>
+          <div id="invest-files" class="invest-files"></div>
+        </div>
+        <div class="invest-opened">
+          <h3 data-i18n="invest.opened">開いたファイル</h3>
+          <div id="invest-output" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="invest-goal">
+        <label for="invest-answer" data-i18n="invest.answer">見つけた秘密（パスワード）</label>
+        <input type="text" id="invest-answer" autocomplete="off">
+        <button type="button" id="invest-check" data-i18n="invest.check">答え合わせ</button>
+        <div id="invest-feedback" aria-live="polite"></div>
+      </div>
+      <details id="invest-hint1">
+        <summary data-i18n="invest.hint1">ヒント1</summary><p data-i18n="invest.hintBody1"></p>
+      </details>
+      <details id="invest-hint2">
+        <summary data-i18n="invest.hint2">ヒント2</summary><p data-i18n="invest.hintBody2"></p>
+      </details>
+      <details id="invest-hint3">
+        <summary data-i18n="invest.hint3">ヒント3</summary><p data-i18n="invest.hintBody3"></p>
+      </details>
+    </section>
   </main>
 
   <footer>
@@ -433,6 +484,38 @@
         <button type="button" id="close-help-modal" aria-label="ヘルプを閉じる" data-i18n-aria-label="html.112" class="close-button">✕</button>
       </div>
       <div class="modal-content">
+        <div class="help-section">
+          <h3 data-i18n="invest.title"></h3>
+          <p data-i18n="help.tabs"></p>
+          <p data-i18n="help.invest"></p>
+          <p data-i18n="help.secret"></p>
+          <p data-i18n="help.dates"></p>
+          <details>
+            <summary data-i18n="help.data"></summary>
+            <div class="git-table-scroll">
+              <table class="git-object-table">
+                <thead><tr>
+                  <th data-i18n="object.hash"></th><th data-i18n="object.type"></th>
+                  <th data-i18n="object.size"></th><th data-i18n="object.content"></th>
+                </tr></thead>
+                <tbody>
+                  <tr><td>053b492e8d60d6e8b50152bb2dbbf62b44d5b1ca</td><td>blob</td><td>66</td><td># Demo App</td></tr>
+                  <tr><td>863230c82209c78e1ba0e7a61304f5197f00a77e</td><td>commit</td><td>173</td><td>Add app config</td></tr>
+                  <tr><td>8b056784a6207580608f107a09abadaf5f6c2af1</td><td>blob</td><td>93</td><td>database:</td></tr>
+                  <tr><td>8cc967668c1a14b8f82064478caf03defd7cfd34</td><td>tree</td><td>75</td><td>README.md, config.yml</td></tr>
+                  <tr><td>b4719a20b17d401cc15d2321f34768f860aa8755</td><td>blob</td><td>104</td><td>database:</td></tr>
+                  <tr><td>d75f7af7e09183ce60c816274fa5e8d9e15e1fb7</td><td>commit</td><td>233</td><td>Remove secrets from config</td></tr>
+                  <tr><td>e9c014bf835507e6cc16b14ec2926f589480d847</td><td>tree</td><td>75</td><td>README.md, config.yml</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+          <h3 data-i18n="calc.title"></h3>
+          <p data-i18n="help.calc"></p>
+          <p data-i18n="help.known"></p>
+          <p data-i18n="calc.note"></p>
+          <p data-i18n="help.api"></p>
+        </div>
         <div class="help-section">
           <h3><span data-i18n="html.113">🗂️ 構造ビューアー</span></h3>
           <p><strong><span data-i18n="html.114">目的:</span></strong> <span data-i18n="html.115">.gitディレクトリーの内部構造を可視化し、各ファイル・フォルダーのセキュリティリスクを理解する</span></p>
@@ -561,6 +644,7 @@
 
   <script src="js/git-core.js"></script>
   <script src="js/git-data.js"></script>
+  <script src="js/scenario-data.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>
