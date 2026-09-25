@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <title>Git Secrets Playground</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <noscript>JavaScriptを有効にしてください。<br>Please enable JavaScript.</noscript>
   <header>
     <div class="header-content">
       <div class="title-section">
@@ -38,30 +40,30 @@
     <section id="objects" class="tab-content">
       <h2>🔍 Gitオブジェクト復元（シミュレーション）</h2>
       <p>SHA-1ハッシュを入力して、Gitオブジェクト（blob / tree / commit）を復元します。</p>
-      
+
       <div class="simulator-notice">
         <h3>🎯 シミュレーター説明</h3>
         <p><strong>このツールはシミュレーターです。</strong> 以下の4種類のサンプルハッシュのみが正しい情報を返します：</p>
         <div class="sample-buttons">
-          <button class="sample-button" onclick="setSampleHash('e69de29bb2d1d6434b8b29ae775ad8c2e48c5391')">
+          <button class="sample-button" data-hash="e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
             📄 空ファイル<br><span class="hash-preview">e69de29b...</span>
           </button>
-          <button class="sample-button" onclick="setSampleHash('557db03de997c86a4a028e1ebd3a1ceb225be238')">
+          <button class="sample-button" data-hash="557db03de997c86a4a028e1ebd3a1ceb225be238">
             📝 テキストファイル<br><span class="hash-preview">557db03d...</span>
           </button>
-          <button class="sample-button" onclick="setSampleHash('3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd')">
+          <button class="sample-button" data-hash="3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd">
             ⚠️ 機密設定ファイル<br><span class="hash-preview">3bb8dc0b...</span>
           </button>
-          <button class="sample-button" onclick="setSampleHash('df799688ee42b4d33e495ffa1a78469753c7dde9')">
+          <button class="sample-button" data-hash="df799688ee42b4d33e495ffa1a78469753c7dde9">
             🐳 Dockerファイル<br><span class="hash-preview">df799688...</span>
           </button>
         </div>
         <p class="other-hash-note">
-          💡 <strong>その他のハッシュを入力した場合：</strong> 
+          💡 <strong>その他のハッシュを入力した場合：</strong>
           「オブジェクトが見つかりません」エラーが表示され、上記4つのサンプルハッシュが提示されます。
         </p>
       </div>
-      
+
       <div class="input-section">
         <input type="text" id="object-hash" placeholder="例: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
         <div class="button-group">
@@ -69,14 +71,14 @@
           <button id="clear-hash" class="clear-button">クリア</button>
         </div>
       </div>
-      <pre id="object-output"></pre>
+      <div id="object-output"></div>
     </section>
 
     <!-- リーク検査 -->
     <section id="leak" class="tab-content">
       <h2>🚨 .gitリーク検査（シミュレーション）</h2>
       <p>特定のURLに `.git/HEAD` などが存在した場合、どのように情報が辿られるかを再現します。</p>
-      
+
       <div class="leak-controls">
         <div class="leak-input-section">
           <label for="target-url">🎯 対象URL:</label>
@@ -89,7 +91,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="scan-options">
           <h4>🔍 検査オプション</h4>
           <div class="option-checkboxes">
@@ -100,7 +102,7 @@
             <label><input type="checkbox" id="check-objects" checked> .git/objects/</label>
           </div>
         </div>
-        
+
         <div class="speed-options">
           <h4>⚡ スキャン速度</h4>
           <div class="speed-controls">
@@ -118,11 +120,11 @@
             </label>
           </div>
         </div>
-        
+
         <button id="simulate-leak" class="scan-button">🚨 スキャン開始</button>
       </div>
 
-      <div id="scan-progress-container" class="scan-progress-container" style="display: none;">
+      <div id="scan-progress-container" class="scan-progress-container" hidden>
         <div class="progress-header">
           <h4>🔍 スキャン進行状況</h4>
           <div class="progress-info">
@@ -131,7 +133,7 @@
           </div>
         </div>
         <div class="progress-bar-container">
-          <div id="progress-bar" class="progress-bar"></div>
+          <progress id="progress-bar" class="progress-bar" value="0" max="1"></progress>
         </div>
         <div class="progress-details">
           <span id="current-step">待機中</span>
@@ -140,7 +142,7 @@
         <div class="scan-controls">
           <button id="skip-scan" class="skip-button">⏭️ 結果をすぐ見る</button>
           <button id="pause-scan" class="control-button">⏸️ 一時停止</button>
-          <button id="resume-scan" class="control-button" style="display: none;">▶️ 再開</button>
+          <button id="resume-scan" class="control-button" hidden>▶️ 再開</button>
         </div>
       </div>
 
@@ -155,13 +157,13 @@
           </div>
         </div>
       </div>
-      
+
       <div class="leak-education">
-        <div class="accordion-header" onclick="toggleAccordion('leak-mechanism')" style="background: #f8f9fa; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-radius: 8px; border: 2px solid #dee2e6;">
-          <h3 style="margin: 0; color: #495057;">📚 .git漏洩の仕組み</h3>
-          <span id="leak-mechanism-icon" style="color: #495057; font-size: 16px;">▼</span>
+        <div class="migrated-1 accordion-header" data-accordion="leak-mechanism">
+          <h3 class="migrated-2">📚 .git漏洩の仕組み</h3>
+          <span id="leak-mechanism-icon" class="migrated-3">▼</span>
         </div>
-        <div id="leak-mechanism" class="accordion-content" style="display: block; background: white; border: 2px solid #dee2e6; border-top: none; border-radius: 0 0 8px 8px; padding: 20px;">
+        <div id="leak-mechanism" class="migrated-4 accordion-content">
           <div class="leak-flow">
             <div class="flow-step">
               <div class="flow-icon">1️⃣</div>
@@ -203,7 +205,7 @@
     <section id="compare" class="tab-content">
       <h2>⚖️ .git構造比較</h2>
       <p>異なる.gitディレクトリー構造を並べて比較し、セキュリティリスクの違いを可視化します。</p>
-      
+
       <div class="comparison-controls">
         <h3>📋 比較対象選択</h3>
         <div class="preset-buttons">
@@ -242,7 +244,7 @@
     <section id="ctf" class="tab-content">
       <h2>🚩 CTFヒント</h2>
       <p>CTF競技でGit漏洩問題を解く際のテクニックとツールを紹介します。</p>
-      
+
       <div class="ctf-categories">
         <div class="ctf-category">
           <h3>🔍 基本的な調査手順</h3>
@@ -257,7 +259,7 @@
                 <p>200 OKが返れば.gitディレクトリーが公開されている</p>
               </div>
             </div>
-            
+
             <div class="ctf-step">
               <div class="step-number">2</div>
               <div class="step-content">
@@ -269,7 +271,7 @@
                 <p>リポジトリ設定と現在のブランチ情報を確認</p>
               </div>
             </div>
-            
+
             <div class="ctf-step">
               <div class="step-number">3</div>
               <div class="step-content">
@@ -294,7 +296,7 @@
               </div>
               <p>自動で.gitディレクトリーをダウンロードしてリポジトリを復元</p>
             </div>
-            
+
             <div class="tool-item">
               <h4>🔧 git-dumper</h4>
               <div class="code-block">
@@ -302,7 +304,7 @@
               </div>
               <p>部分的に公開された.gitディレクトリーからファイルを復元</p>
             </div>
-            
+
             <div class="tool-item">
               <h4>🌐 Wayback Machine</h4>
               <div class="code-block">
@@ -327,7 +329,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="pattern-item">
               <h4>🌿 パターン2: 別ブランチのフラグ</h4>
               <div class="pattern-description">
@@ -340,7 +342,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="pattern-item">
               <h4>📝 パターン3: コミットメッセージのヒント</h4>
               <div class="pattern-description">
@@ -353,7 +355,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="pattern-item">
               <h4>🗂️ パターン4: 設定ファイルの機密情報</h4>
               <div class="pattern-description">
@@ -380,7 +382,7 @@
                 git log -S "password" --source --all</code>
               </div>
             </div>
-            
+
             <div class="technique-item">
               <h4>📂 削除されたファイルの一覧</h4>
               <div class="code-block">
@@ -388,7 +390,7 @@
                 git log --diff-filter=D --summary | grep delete</code>
               </div>
             </div>
-            
+
             <div class="technique-item">
               <h4>🕒 特定時点の復元</h4>
               <div class="code-block">
@@ -397,7 +399,7 @@
                 git checkout [commit-hash] -- filename</code>
               </div>
             </div>
-            
+
             <div class="technique-item">
               <h4>🔐 隠されたブランチやタグ</h4>
               <div class="code-block">
@@ -420,7 +422,7 @@
   </footer>
 
   <!-- ヘルプモーダル -->
-  <div id="help-modal" class="modal-overlay" style="display: none;">
+  <div id="help-modal" class="modal-overlay" hidden>
     <div class="modal-container">
       <div class="modal-header">
         <h2>📚 Git Secrets Playground ヘルプ</h2>
@@ -438,9 +440,9 @@
           </ul>
           <p><strong>リスクレベル:</strong></p>
           <ul>
-            <li><span style="color: #ff3333;">💥 HIGH RISK</span> - 機密情報の完全漏洩につながる重要ファイル</li>
-            <li><span style="color: #ff8800;">💣 MEDIUM RISK</span> - 部分的な情報漏洩の可能性があるファイル</li>
-            <li><span style="color: #22aa22;">⚠️ LOW RISK</span> - 基本的な構造情報のみ含むファイル</li>
+            <li><span class="migrated-5">💥 HIGH RISK</span> - 機密情報の完全漏洩につながる重要ファイル</li>
+            <li><span class="migrated-6">💣 MEDIUM RISK</span> - 部分的な情報漏洩の可能性があるファイル</li>
+            <li><span class="migrated-7">⚠️ LOW RISK</span> - 基本的な構造情報のみ含むファイル</li>
           </ul>
         </div>
 
@@ -555,6 +557,6 @@
 
   <script src="js/git-core.js"></script>
   <script src="js/git-data.js"></script>
-  <script src="script.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

@@ -1849,3 +1849,209 @@ footer {
     font-size: 1.5rem;
   }
 }
+
+.migrated-1 {
+  background: #f8f9fa;
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+}
+
+.migrated-2 {
+  margin: 0;
+  color: #495057;
+}
+
+.migrated-3 {
+  color: #495057;
+  font-size: 16px;
+}
+
+.migrated-4 {
+  display: block;
+  background: white;
+  border: 2px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 20px;
+}
+
+.migrated-5 {
+  color: #ff3333;
+}
+
+.migrated-6 {
+  color: #ff8800;
+}
+
+.migrated-7 {
+  color: #22aa22;
+}
+
+/* State and DOM-rendered components (no inline presentation). */
+[hidden] {
+  display: none !important;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+.tree-row, .comparison-tree-row {
+  white-space: pre;
+  font-family: monospace;
+}
+
+.tree-branch {
+  color: #888;
+}
+
+.tree-description {
+  color: #999;
+  font-size: 0.85em;
+}
+
+.risk-badge {
+  background: white;
+  border: 1px solid currentColor;
+  padding: 1px 4px;
+  margin-left: 4px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 0.8em;
+}
+
+.risk-badge.risk-high {
+  color: #ff3333;
+}
+
+.risk-badge.risk-medium {
+  color: #ff8800;
+}
+
+.risk-badge.risk-low {
+  color: #22aa22;
+}
+
+.folder-toggle, button.hash-clickable {
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 2px 4px;
+}
+
+.folder-toggle:hover, button.hash-clickable:hover {
+  background: #e9ecef;
+}
+
+.copy-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: min(320px, calc(100vw - 64px));
+  padding: 12px 16px;
+  background: #28a745;
+  color: white;
+  border-radius: 8px;
+  z-index: 1001;
+}
+
+.toast-error {
+  background: #c62828;
+}
+
+.clipboard-fallback {
+  position: fixed;
+  left: -10000px;
+}
+
+.object-metadata {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+}
+
+.object-metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.object-metadata dt {
+  font-weight: bold;
+}
+
+.recovery-success {
+  color: #2e7d32;
+}
+
+.recovery-methods {
+  margin-top: 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.recovery-methods .accordion-header {
+  width: 100%;
+}
+
+.recovery-methods .accordion-content {
+  padding: 15px;
+}
+
+.scan-step {
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 6px;
+  animation: scan-appear 0.2s ease-out;
+}
+
+.scan-step-info {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+}
+
+.scan-step-scan {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+}
+
+.scan-step-success {
+  background: #e8f5e8;
+  border-left: 4px solid #4caf50;
+}
+
+.scan-step-warning {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+.scan-step-danger {
+  background: #f8d7da;
+  border-left: 4px solid #dc3545;
+}
+
+progress.progress-bar {
+  width: 100%;
+  display: block;
+  appearance: auto;
+}
+
+.scan-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scan-button[data-state="paused"] {
+  background: #28a745;
+}
+
+@keyframes scan-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
