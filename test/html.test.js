@@ -26,3 +26,18 @@ test('classic scripts use safe DOM APIs and embedded data', () => {
     assert.doesNotMatch(source, /innerHTML|insertAdjacentHTML|outerHTML\s*=|\.style\.|console\.log|fetch\(|onclick/, file);
   }
 });
+
+test('tabs, modal, labels, links and button types are accessible', () => {
+  assert.match(html, /role="tablist"/);
+  assert.equal((html.match(/role="tab"/g) || []).length, 5);
+  assert.equal((html.match(/role="tabpanel"/g) || []).length, 5);
+  assert.equal((html.match(/aria-selected="(?:true|false)"/g) || []).length, 5);
+  assert.match(html, /role="dialog"[^>]*aria-labelledby="help-title"/);
+  for (const match of html.matchAll(/<button\b[^>]*>/g)) assert.match(match[0], /type="button"/);
+  for (const match of html.matchAll(/<label[^>]*for="([^"]+)"/g)) {
+    assert.ok(html.includes(`id="${match[1]}"`), match[1]);
+  }
+  for (const match of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) {
+    assert.match(match[0], /rel="noopener noreferrer"/);
+  }
+});

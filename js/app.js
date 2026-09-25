@@ -30,11 +30,25 @@ document.querySelectorAll('.tab-button').forEach(control => {
   control.addEventListener('click', () => {
     document.querySelectorAll('.tab-button').forEach(tab => {
       tab.classList.toggle('active', tab === control);
+      tab.setAttribute('aria-selected', String(tab === control));
+      tab.tabIndex = tab === control ? 0 : -1;
     });
     document.querySelectorAll('.tab-content').forEach(panel => {
       panel.classList.toggle('active', panel.id === control.dataset.tab);
     });
   });
+});
+
+document.querySelector('.tab-nav').addEventListener('keydown', event => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const tabs = [...document.querySelectorAll('.tab-button')];
+  const current = tabs.indexOf(document.activeElement);
+  if (current < 0) return;
+  event.preventDefault();
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :
+    (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next].click();
+  tabs[next].focus();
 });
 
 const collapsedFolders = new Set();
@@ -59,8 +73,12 @@ function renderTree(node, path = '.git', prefix = '', isLast = true, parentHash 
       if (children.hidden) collapsedFolders.add(path);
       else collapsedFolders.delete(path);
       toggle.textContent = children.hidden ? '📁 ▶' : '📁 ▼';
+      toggle.setAttribute('aria-expanded', String(!children.hidden));
     }, 'folder-toggle');
     toggle.dataset.folder = path;
+    toggle.setAttribute('aria-expanded', String(!children.hidden));
+    toggle.setAttribute('aria-controls', children.id);
+    toggle.setAttribute('aria-label', `${node.name}を開閉`);
     row.append(toggle);
   } else {
     row.append(element('span', node.type === 'folder' ? '📁 ' : '📄 '));
@@ -179,6 +197,9 @@ function toggleAccordion(id) {
   content.hidden = !content.hidden;
   const icon = byId(id + '-icon');
   if (icon) icon.textContent = content.hidden ? '▼' : '▲';
+  document.querySelectorAll(`[aria-controls="${id}"]`).forEach(control => {
+    control.setAttribute('aria-expanded', String(!content.hidden));
+  });
 }
 
 function recoveryMethods(hash) {
@@ -187,6 +208,8 @@ function recoveryMethods(hash) {
   const detail = element('div', '', 'accordion-content');
   detail.id = 'method-details';
   detail.hidden = true;
+  header.setAttribute('aria-expanded', 'false');
+  header.setAttribute('aria-controls', detail.id);
   detail.append(element('p', '次は許可されたテスト環境でのみ使うコマンドの例です。ここでは実行しません。'));
   const sections = [
     ['1. オブジェクトファイルの取得',
@@ -271,11 +294,13 @@ document.querySelectorAll('[data-accordion]').forEach(control => {
 byId('help-button').addEventListener('click', () => {
   byId('help-modal').hidden = false;
   document.body.classList.add('modal-open');
+  byId('close-help-modal').focus();
 });
 
 function closeHelp() {
   byId('help-modal').hidden = true;
   document.body.classList.remove('modal-open');
+  byId('help-button').focus();
 }
 
 byId('close-help-modal').addEventListener('click', closeHelp);
@@ -283,7 +308,35 @@ byId('help-modal').addEventListener('click', event => {
   if (event.target === byId('help-modal')) closeHelp();
 });
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && !byId('help-modal').hidden) closeHelp();
+  if (byId('help-modal').hidden) return;
+  if (event.key === 'Escape') closeHelp();
+  if (event.key !== 'Tab') return;
+  const controls = [...byId('help-modal').querySelectorAll('button, a[href], input, [tabindex="0"]')]
+    .filter(control => control.getClientRects().length && !control.disabled);
+  const first = controls[0];
+  const last = controls.at(-1);
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+// CTF reference sections remain expanded initially, and support keyboard folding.
+document.querySelectorAll('.ctf-category').forEach((category, index) => {
+  const heading = category.querySelector('h3');
+  if (!heading) return;
+  const title = heading.textContent;
+  const content = element('div');
+  content.id = 'ctf-details-' + index;
+  while (heading.nextSibling) content.append(heading.nextSibling);
+  const control = button(title, () => toggleAccordion(content.id), 'ctf-accordion');
+  control.setAttribute('aria-controls', content.id);
+  control.setAttribute('aria-expanded', 'true');
+  heading.replaceChildren(control);
+  category.append(content);
 });
 
 // The scan is a local animation over fixed educational steps, never a request.

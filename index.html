@@ -14,22 +14,22 @@
     <div class="header-content">
       <div class="title-section">
         <h1>🕵️ Git Secrets Playground</h1>
-        <button id="help-button" class="help-button" title="ヘルプを表示">❓</button>
+        <button type="button" id="help-button" aria-label="ヘルプを表示" class="help-button" title="ヘルプを表示">❓</button>
       </div>
       <p class="subtitle">.gitディレクトリーの構造と漏洩リスクをシミュレーションで学ぼう</p>
     </div>
-    <nav class="tab-nav">
-      <button class="tab-button active" data-tab="structure">構造ビューアー</button>
-      <button class="tab-button" data-tab="objects">オブジェクト復元</button>
-      <button class="tab-button" data-tab="leak">リーク検査</button>
-      <button class="tab-button" data-tab="compare">構造比較</button>
-      <button class="tab-button" data-tab="ctf">CTFヒント</button>
+    <nav class="tab-nav" role="tablist" aria-label="機能">
+      <button type="button" class="tab-button active" data-tab="structure" id="tab-structure" role="tab" aria-controls="structure" aria-selected="true" tabindex="0">構造ビューアー</button>
+      <button type="button" class="tab-button" data-tab="objects" id="tab-objects" role="tab" aria-controls="objects" aria-selected="false" tabindex="-1">オブジェクト復元</button>
+      <button type="button" class="tab-button" data-tab="leak" id="tab-leak" role="tab" aria-controls="leak" aria-selected="false" tabindex="-1">リーク検査</button>
+      <button type="button" class="tab-button" data-tab="compare" id="tab-compare" role="tab" aria-controls="compare" aria-selected="false" tabindex="-1">構造比較</button>
+      <button type="button" class="tab-button" data-tab="ctf" id="tab-ctf" role="tab" aria-controls="ctf" aria-selected="false" tabindex="-1">CTFヒント</button>
     </nav>
   </header>
 
   <main>
     <!-- 構造ビューア -->
-    <section id="structure" class="tab-content active">
+    <section id="structure" class="tab-content active" role="tabpanel" aria-labelledby="tab-structure">
       <h2>📁 .git構造ビューアー</h2>
       <p>.gitフォルダーの中身をツリー表示し、それぞれの意味とリスクを可視化します。</p>
       <div id="statistics-panel"></div>
@@ -37,7 +37,7 @@
     </section>
 
     <!-- オブジェクト復元 -->
-    <section id="objects" class="tab-content">
+    <section id="objects" class="tab-content" role="tabpanel" aria-labelledby="tab-objects">
       <h2>🔍 Gitオブジェクト復元（シミュレーション）</h2>
       <p>SHA-1ハッシュを入力して、Gitオブジェクト（blob / tree / commit）を復元します。</p>
 
@@ -45,16 +45,16 @@
         <h3>🎯 シミュレーター説明</h3>
         <p><strong>このツールはシミュレーターです。</strong> 以下の4種類のサンプルハッシュのみが正しい情報を返します：</p>
         <div class="sample-buttons">
-          <button class="sample-button" data-hash="e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
+          <button type="button" class="sample-button" data-hash="e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
             📄 空ファイル<br><span class="hash-preview">e69de29b...</span>
           </button>
-          <button class="sample-button" data-hash="557db03de997c86a4a028e1ebd3a1ceb225be238">
+          <button type="button" class="sample-button" data-hash="557db03de997c86a4a028e1ebd3a1ceb225be238">
             📝 テキストファイル<br><span class="hash-preview">557db03d...</span>
           </button>
-          <button class="sample-button" data-hash="3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd">
+          <button type="button" class="sample-button" data-hash="3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd">
             ⚠️ 機密設定ファイル<br><span class="hash-preview">3bb8dc0b...</span>
           </button>
-          <button class="sample-button" data-hash="df799688ee42b4d33e495ffa1a78469753c7dde9">
+          <button type="button" class="sample-button" data-hash="df799688ee42b4d33e495ffa1a78469753c7dde9">
             🐳 Dockerファイル<br><span class="hash-preview">df799688...</span>
           </button>
         </div>
@@ -64,18 +64,19 @@
         </p>
       </div>
 
+        <label for="object-hash">SHA-1ハッシュ</label>
       <div class="input-section">
         <input type="text" id="object-hash" placeholder="例: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391">
         <div class="button-group">
-          <button id="recover-object">復元</button>
-          <button id="clear-hash" class="clear-button">クリア</button>
+          <button type="button" id="recover-object">復元</button>
+          <button type="button" id="clear-hash" class="clear-button">クリア</button>
         </div>
       </div>
       <div id="object-output"></div>
     </section>
 
     <!-- リーク検査 -->
-    <section id="leak" class="tab-content">
+    <section id="leak" class="tab-content" role="tabpanel" aria-labelledby="tab-leak">
       <h2>🚨 .gitリーク検査（シミュレーション）</h2>
       <p>特定のURLに `.git/HEAD` などが存在した場合、どのように情報が辿られるかを再現します。</p>
 
@@ -85,9 +86,9 @@
           <div class="url-input-container">
             <input type="text" id="target-url" placeholder="https://example.com">
             <div class="preset-urls">
-              <button class="preset-url-btn" data-url="https://vulnerable-site.com">脆弱サイト例</button>
-              <button class="preset-url-btn" data-url="https://dev.company.com">開発サーバー例</button>
-              <button class="preset-url-btn" data-url="https://staging.webapp.io">ステージング例</button>
+              <button type="button" class="preset-url-btn" data-url="https://vulnerable-site.com">脆弱サイト例</button>
+              <button type="button" class="preset-url-btn" data-url="https://dev.company.com">開発サーバー例</button>
+              <button type="button" class="preset-url-btn" data-url="https://staging.webapp.io">ステージング例</button>
             </div>
           </div>
         </div>
@@ -121,7 +122,7 @@
           </div>
         </div>
 
-        <button id="simulate-leak" class="scan-button">🚨 スキャン開始</button>
+        <button type="button" id="simulate-leak" class="scan-button">🚨 スキャン開始</button>
       </div>
 
       <div id="scan-progress-container" class="scan-progress-container" hidden>
@@ -140,9 +141,9 @@
           <span id="step-counter">0 / 0</span>
         </div>
         <div class="scan-controls">
-          <button id="skip-scan" class="skip-button">⏭️ 結果をすぐ見る</button>
-          <button id="pause-scan" class="control-button">⏸️ 一時停止</button>
-          <button id="resume-scan" class="control-button" hidden>▶️ 再開</button>
+          <button type="button" id="skip-scan" class="skip-button">⏭️ 結果をすぐ見る</button>
+          <button type="button" id="pause-scan" class="control-button">⏸️ 一時停止</button>
+          <button type="button" id="resume-scan" class="control-button" hidden>▶️ 再開</button>
         </div>
       </div>
 
@@ -159,10 +160,11 @@
       </div>
 
       <div class="leak-education">
-        <div class="migrated-1 accordion-header" data-accordion="leak-mechanism">
-          <h3 class="migrated-2">📚 .git漏洩の仕組み</h3>
+        <button type="button" class="migrated-1 accordion-header" data-accordion="leak-mechanism"
+          aria-expanded="true" aria-controls="leak-mechanism">
+          <span class="migrated-2">📚 .git漏洩の仕組み</span>
           <span id="leak-mechanism-icon" class="migrated-3">▼</span>
-        </div>
+        </button>
         <div id="leak-mechanism" class="migrated-4 accordion-content">
           <div class="leak-flow">
             <div class="flow-step">
@@ -202,20 +204,20 @@
     </section>
 
     <!-- 構造比較 -->
-    <section id="compare" class="tab-content">
+    <section id="compare" class="tab-content" role="tabpanel" aria-labelledby="tab-compare">
       <h2>⚖️ .git構造比較</h2>
       <p>異なる.gitディレクトリー構造を並べて比較し、セキュリティリスクの違いを可視化します。</p>
 
       <div class="comparison-controls">
         <h3>📋 比較対象選択</h3>
         <div class="preset-buttons">
-          <button class="preset-button" data-preset="secure-vs-insecure">
+          <button type="button" class="preset-button" data-preset="secure-vs-insecure">
             🛡️ セキュアな設定 vs 危険な設定
           </button>
-          <button class="preset-button" data-preset="private-vs-public">
+          <button type="button" class="preset-button" data-preset="private-vs-public">
             🔒 プライベートリポジトリ vs パブリックリポジトリ
           </button>
-          <button class="preset-button" data-preset="dev-vs-prod">
+          <button type="button" class="preset-button" data-preset="dev-vs-prod">
             🔧 開発環境 vs 本番環境
           </button>
         </div>
@@ -241,7 +243,7 @@
     </section>
 
     <!-- CTFヒント -->
-    <section id="ctf" class="tab-content">
+    <section id="ctf" class="tab-content" role="tabpanel" aria-labelledby="tab-ctf">
       <h2>🚩 CTFヒント</h2>
       <p>CTF競技でGit漏洩問題を解く際のテクニックとツールを紹介します。</p>
 
@@ -417,16 +419,16 @@
 
   <footer>
     <div class="footer">
-      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/git-secrets-playground" target="_blank">ipusiron/git-secrets-playground</a> ）
+      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/git-secrets-playground" target="_blank" rel="noopener noreferrer">ipusiron/git-secrets-playground</a> ）
     </div>
   </footer>
 
   <!-- ヘルプモーダル -->
-  <div id="help-modal" class="modal-overlay" hidden>
+  <div id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" class="modal-overlay" hidden>
     <div class="modal-container">
       <div class="modal-header">
-        <h2>📚 Git Secrets Playground ヘルプ</h2>
-        <button id="close-help-modal" class="close-button">✕</button>
+        <h2 id="help-title">📚 Git Secrets Playground ヘルプ</h2>
+        <button type="button" id="close-help-modal" aria-label="ヘルプを閉じる" class="close-button">✕</button>
       </div>
       <div class="modal-content">
         <div class="help-section">
@@ -545,10 +547,10 @@
         <div class="help-section">
           <h3>🔗 関連リソース</h3>
           <ul>
-            <li><a href="https://git-scm.com/book/ja/v2/Git%E3%81%AE%E5%86%85%E5%81%B4-Git%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" target="_blank">公式Git内部構造ドキュメント</a></li>
-            <li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10</a></li>
-            <li><a href="https://github.com/WangYihang/GitHacker" target="_blank">GitHacker Tool</a></li>
-            <li><a href="https://github.com/arthaud/git-dumper" target="_blank">git-dumper Tool</a></li>
+            <li><a href="https://git-scm.com/book/ja/v2/Git%E3%81%AE%E5%86%85%E5%81%B4-Git%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" target="_blank" rel="noopener noreferrer">公式Git内部構造ドキュメント</a></li>
+            <li><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener noreferrer">OWASP Top 10</a></li>
+            <li><a href="https://github.com/WangYihang/GitHacker" target="_blank" rel="noopener noreferrer">GitHacker Tool</a></li>
+            <li><a href="https://github.com/arthaud/git-dumper" target="_blank" rel="noopener noreferrer">git-dumper Tool</a></li>
           </ul>
         </div>
       </div>
