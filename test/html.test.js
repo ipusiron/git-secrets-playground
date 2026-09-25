@@ -16,6 +16,18 @@ test('investigation tab, controls and embedded scenario exist', () => {
   assert.match(html, /<script src="js\/scenario-data.js"><\/script>/);
 });
 
+test('real calculation controls preserve labels and safe examples', () => {
+  for (const id of ['calc-text', 'calc-newline', 'calc-create', 'calc-input-hex', 'calc-expected', 'calc-read']) {
+    assert.ok(html.includes('id="' + id + '"'));
+  }
+  assert.match(html, /id="calc-newline" checked/);
+  const files = require('node:child_process').execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).trim().split('\n');
+  const forbidden = new RegExp(['vulnerable', 'site'].join('-') + '|' + ['target', 'site'].join('-'));
+  for (const file of files.filter(name => /\.(js|html|md|css|json|yml)$/.test(name))) {
+    assert.doesNotMatch(fs.readFileSync(path.join(root, file), 'utf8'), forbidden, file);
+  }
+});
+
 test('strict CSP, referrer and scripting fallback', () => {
   const csp = html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
   assert.equal(csp, "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; " +

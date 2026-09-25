@@ -195,6 +195,7 @@ function getSampleDescriptions() {
 let sampleDescriptions = getSampleDescriptions();
 
 let recoveredHash = null;
+let recoveryCalculation = null;
 
 function toggleAccordion(id) {
   const content = byId(id);
@@ -217,14 +218,14 @@ function recoveryMethods(hash) {
   detail.append(element('p', i18n.t('app.16')));
   const sections = [
     [i18n.t('app.17'),
-      `curl -s https://target.com/${GitCore.objectPath(hash)} -o object_file\n` +
-      `wget https://target.com/${GitCore.objectPath(hash)} -O object_file`],
+      `curl -s https://target.example/${GitCore.objectPath(hash)} -o object_file\n` +
+      `wget https://target.example/${GitCore.objectPath(hash)} -O object_file`],
     [i18n.t('app.18'),
       `python3 -c "import zlib; print(zlib.decompress(open('object_file', 'rb').read()).decode('utf-8', errors='ignore'))"\n` +
       `ruby -e "require 'zlib'; puts Zlib.inflate(File.binread('object_file'))"\nopenssl zlib -d -in object_file`],
     [i18n.t('app.19'), `git cat-file -p ${hash}\ngit cat-file -t ${hash}\ngit cat-file -s ${hash}`],
-    [i18n.t('app.20'), 'python3 GitHack.py https://target.com/.git/\n' +
-      'git-dumper https://target.com/.git/ output_dir\n./rip-git.pl -v -u https://target.com/.git/']
+    [i18n.t('app.20'), 'python3 GitHack.py https://target.example/.git/\n' +
+      'git-dumper https://target.example/.git/ output_dir\n./rip-git.pl -v -u https://target.example/.git/']
   ];
   sections.forEach(([title, code]) => {
     detail.append(element('h4', title), element('pre', code));
@@ -255,15 +256,23 @@ function renderRecovery() {
   output.append(element('h3', i18n.t('app.29'), 'recovery-success'));
   const metadata = element('dl', '', 'object-metadata');
   const fields = [
-    ['SHA-1', obj.hash], ['Type', obj.type], ['Size', `${obj.size} bytes`],
-    ['Description', sampleDescriptions[index]], ['Path', GitCore.objectPath(obj.hash)]
+    [i18n.t('object.hash'), recoveryCalculation?.hash || obj.hash], [i18n.t('object.type'), obj.type],
+    [i18n.t('object.size'), i18n.t('calc.bytes', { n: obj.size })],
+    [i18n.t('object.description'), sampleDescriptions[index]], [i18n.t('object.path'), GitCore.objectPath(obj.hash)]
   ];
   fields.forEach(([label, value]) => {
     metadata.append(element('dt', label), element('dd', value));
   });
-  output.append(metadata, element('h4', 'Content'));
+  output.append(metadata, element('h4', i18n.t('object.content')));
+  if (recoveryCalculation?.hash) {
+    output.append(element('p', i18n.t(recoveryCalculation.hash === obj.hash ? 'calc.sampleMatch' : 'calc.sampleMismatch')));
+  } else if (recoveryCalculation?.error) {
+    output.append(element('p', i18n.t('object.failed'), 'error-message'));
+  } else {
+    output.append(element('p', i18n.t(GitCore.webCryptoAvailable() ? 'invest.busy' : 'object.unavailable')));
+  }
   if (index === 2) output.append(element('p', i18n.t('app.30'), 'error-message'));
-  output.append(element('pre', obj.content || '(empty file)', 'object-content'));
+  output.append(element('pre', obj.content || i18n.t('calc.empty'), 'object-content'));
   output.append(element('p', i18n.t('app.31'), 'simulation-notice'));
   if (index === 2) {
     output.append(element('p', i18n.t('app.32'), 'warning-box'));
@@ -279,14 +288,25 @@ document.querySelectorAll('.sample-button').forEach(control => {
   });
 });
 
-byId('recover-object').addEventListener('click', () => {
+byId('recover-object').addEventListener('click', async () => {
   recoveredHash = GitCore.normalizeHash(byId('object-hash').value);
+  const current = { hash: null };
+  recoveryCalculation = current;
   renderRecovery();
+  const sample = SAMPLE_OBJECTS.find(obj => obj.hash === recoveredHash);
+  if (!sample || !GitCore.webCryptoAvailable()) return;
+  try {
+    current.hash = await GitCore.hashObject('blob', new TextEncoder().encode(sample.content));
+  } catch {
+    current.error = true;
+  }
+  if (recoveryCalculation === current && recoveredHash !== null) renderRecovery();
 });
 
 byId('clear-hash').addEventListener('click', () => {
   byId('object-hash').value = '';
   recoveredHash = null;
+  recoveryCalculation = null;
   renderRecovery();
   byId('object-hash').focus();
 });
@@ -1109,6 +1129,104 @@ function loadPresetComparison(presetKey) {
 document.querySelectorAll('.preset-button').forEach(control => {
   control.addEventListener('click', () => loadPresetComparison(control.dataset.preset));
 });
+
+const calculation = { created: null, decoded: null };
+const calculationErrors = {
+  notHex: 'calc.notHex', badZlib: 'object.badZlib', noHeader: 'calc.noHeader',
+  badHeader: 'calc.badHeader', sizeMismatch: 'calc.sizeMismatch', badTree: 'calc.badTree'
+};
+
+// Validate untrusted tree framing before invoking the unchanged reference parser.
+function validateTreeBytes(body) {
+  let position = 0;
+  while (position < body.length) {
+    const space = body.indexOf(32, position);
+    const nul = space < 0 ? -1 : body.indexOf(0, space);
+    if (space <= position || nul <= space + 1 || nul + 21 > body.length) throw new Error('badTree');
+    const mode = new TextDecoder().decode(body.slice(position, space));
+    if (!/^[0-7]+$/.test(mode)) throw new Error('badTree');
+    position = nul + 21;
+  }
+}
+
+function renderCalculation() {
+  const unavailable = !GitCore.webCryptoAvailable();
+  byId('calc-unavailable').hidden = !unavailable;
+  for (const [kind, target, control] of [['created', 'calc-created', 'calc-create'], ['decoded', 'calc-decoded', 'calc-read']]) {
+    const state = calculation[kind];
+    const output = byId(target);
+    output.replaceChildren();
+    byId(control).disabled = unavailable || Boolean(state?.busy);
+    if (!state) continue;
+    if (state.error || state.busy) {
+      output.append(element('p', i18n.t(state.error || 'invest.busy'), state.error ? 'error-message' : ''));
+      continue;
+    }
+    if (kind === 'created') {
+      const data = element('dl', '', 'object-metadata');
+      for (const [key, value] of [
+        ['object.size', i18n.t('calc.bytes', { n: state.body.length })],
+        ['calc.headerHex', state.header], ['object.hash', state.hash], ['object.path', GitCore.objectPath(state.hash)]
+      ]) data.append(element('dt', i18n.t(key)), element('dd', value));
+      output.append(data, element('h5', i18n.t('calc.hex')), element('pre', state.hex, 'calculated-hex'));
+    } else {
+      if (state.expected) output.append(element('p', i18n.t(state.object.matches ? 'calc.match' : 'calc.mismatch')));
+      output.append(renderGitObject(state.object));
+    }
+  }
+}
+
+byId('calc-create').addEventListener('click', async () => {
+  if (!GitCore.webCryptoAvailable()) return;
+  const state = { busy: true };
+  calculation.created = state;
+  const text = byId('calc-text').value + (byId('calc-newline').checked ? '\n' : '');
+  const body = new TextEncoder().encode(text);
+  if (body.length > 64 * 1024) {
+    state.error = 'calc.limitText';
+    state.busy = false;
+    renderCalculation();
+    return;
+  }
+  renderCalculation();
+  try {
+    state.body = body;
+    state.header = GitCore.bytesToHex(new TextEncoder().encode(GitCore.blobHeader(body.length)));
+    state.hash = await GitCore.hashObject('blob', body);
+    state.hex = GitCore.bytesToHex(await GitCore.deflate(GitCore.encodeObject('blob', body)));
+  } catch {
+    state.error = 'object.failed';
+  } finally {
+    state.busy = false;
+    renderCalculation();
+  }
+});
+
+byId('calc-read').addEventListener('click', async () => {
+  if (!GitCore.webCryptoAvailable()) return;
+  const state = { busy: true, expected: GitCore.normalizeHash(byId('calc-expected').value) };
+  calculation.decoded = state;
+  const hex = byId('calc-input-hex').value.replace(/\s+/g, '');
+  if (hex.length > 128 * 1024) state.error = 'calc.limitHex';
+  else if (state.expected && !GitCore.isValidHash(state.expected)) state.error = 'calc.badHash';
+  if (state.error) {
+    state.busy = false;
+    renderCalculation();
+    return;
+  }
+  renderCalculation();
+  try {
+    state.object = await GitCore.openLoose(state.expected, GitCore.hexToBytes(hex));
+    if (state.object.type === 'tree') validateTreeBytes(state.object.body);
+  } catch (error) {
+    state.error = calculationErrors[error.message] || 'object.failed';
+  } finally {
+    state.busy = false;
+    renderCalculation();
+  }
+});
+renderCalculation();
+i18n.onChange(renderCalculation);
 
 // Investigation state is in memory only. A selected-file identity guards async results.
 const investigation = { opened: null, retrieved: new Set(), answer: null };

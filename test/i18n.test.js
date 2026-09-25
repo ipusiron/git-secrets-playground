@@ -27,6 +27,16 @@ test('investigation and shared metadata translations exist in both languages', (
   for (const lang of ['ja', 'en']) keys.forEach(key => assert.ok(dictionaries[lang][key], key));
 });
 
+test('calculation errors and original recovery labels are translated', () => {
+  const labels = ['hash', 'type', 'size', 'description', 'path', 'content'];
+  for (const lang of ['ja', 'en']) {
+    labels.forEach(key => assert.ok(dictionaries[lang]['object.' + key]));
+    for (const key of ['title', 'calculate', 'decompress', 'notHex', 'noHeader', 'badHeader', 'sizeMismatch',
+      'limitText', 'limitHex', 'sampleMatch']) assert.ok(dictionaries[lang]['calc.' + key]);
+  }
+  assert.deepEqual(labels.map(key => dictionaries.ja['object.' + key]), ['SHA-1', '種類', 'サイズ', '説明', '置き場所', '中身']);
+});
+
 test('dictionaries have matching keys, nonempty text and matching placeholders', () => {
   assert.deepEqual(Object.keys(dictionaries.ja).sort(), Object.keys(dictionaries.en).sort());
   for (const key of Object.keys(dictionaries.ja)) {

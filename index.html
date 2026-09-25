@@ -77,6 +77,24 @@
         </div>
       </div>
       <div id="object-output"></div>
+      <section id="real-calculation" class="calculation">
+        <h3 data-i18n="calc.title">🧮 本物の計算</h3>
+        <p id="calc-unavailable" class="error-message" data-i18n="object.unavailable" hidden></p>
+        <h4 data-i18n="calc.encode">中身からハッシュを作る</h4>
+        <label for="calc-text" data-i18n="calc.text"></label>
+        <textarea id="calc-text" rows="4"></textarea>
+        <label class="calc-checkbox"><input type="checkbox" id="calc-newline" checked><span data-i18n="calc.newline"></span></label>
+        <button type="button" id="calc-create" data-i18n="calc.calculate">計算する</button>
+        <div id="calc-created" aria-live="polite"></div>
+        <p data-i18n="calc.note"></p>
+        <h4 data-i18n="calc.decode">.git/objects のファイルを読む</h4>
+        <label for="calc-input-hex" data-i18n="calc.inputHex"></label>
+        <textarea id="calc-input-hex" rows="4"></textarea>
+        <label for="calc-expected" data-i18n="calc.expected"></label>
+        <input type="text" id="calc-expected" autocomplete="off">
+        <button type="button" id="calc-read" data-i18n="calc.decompress">解凍する</button>
+        <div id="calc-decoded" aria-live="polite"></div>
+      </section>
     </section>
 
     <!-- リーク検査 -->
@@ -90,9 +108,9 @@
           <div class="url-input-container">
             <input type="text" id="target-url" placeholder="https://example.com">
             <div class="preset-urls">
-              <button type="button" class="preset-url-btn" data-url="https://vulnerable-site.com"><span data-i18n="html.30">脆弱サイト例</span></button>
-              <button type="button" class="preset-url-btn" data-url="https://dev.company.com"><span data-i18n="html.31">開発サーバー例</span></button>
-              <button type="button" class="preset-url-btn" data-url="https://staging.webapp.io"><span data-i18n="html.32">ステージング例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://vulnerable.example"><span data-i18n="html.30">脆弱サイト例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://dev.example.com"><span data-i18n="html.31">開発サーバー例</span></button>
+              <button type="button" class="preset-url-btn" data-url="https://staging.example.org"><span data-i18n="html.32">ステージング例</span></button>
             </div>
           </div>
         </div>
@@ -260,7 +278,7 @@
               <div class="step-content">
                 <h4><span data-i18n="html.72">.gitディレクトリーの存在確認</span></h4>
                 <div class="code-block">
-                  <code>curl -I https://target.com/.git/HEAD</code>
+                  <code>curl -I https://target.example/.git/HEAD</code>
                 </div>
                 <p><span data-i18n="html.73">200 OKが返れば.gitディレクトリーが公開されている</span></p>
               </div>
@@ -271,8 +289,8 @@
               <div class="step-content">
                 <h4><span data-i18n="html.74">基本情報の取得</span></h4>
                 <div class="code-block">
-                  <code>curl https://target.com/.git/config<br>
-                  curl https://target.com/.git/HEAD</code>
+                  <code>curl https://target.example/.git/config<br>
+                  curl https://target.example/.git/HEAD</code>
                 </div>
                 <p><span data-i18n="html.75">リポジトリー設定と現在のブランチ情報を確認</span></p>
               </div>
@@ -283,8 +301,8 @@
               <div class="step-content">
                 <h4><span data-i18n="html.76">コミット履歴の探索</span></h4>
                 <div class="code-block">
-                  <code>curl https://target.com/.git/logs/HEAD<br>
-                  curl https://target.com/.git/logs/refs/heads/main</code>
+                  <code>curl https://target.example/.git/logs/HEAD<br>
+                  curl https://target.example/.git/logs/refs/heads/main</code>
                 </div>
                 <p><span data-i18n="html.77">過去のコミットハッシュとメッセージを取得</span></p>
               </div>
@@ -298,7 +316,7 @@
             <div class="tool-item">
               <h4>📦 GitHacker</h4>
               <div class="code-block">
-                <code>python GitHacker.py --url https://target.com/.git/ --folder result</code>
+                <code>python GitHacker.py --url https://target.example/.git/ --folder result</code>
               </div>
               <p><span data-i18n="html.79">自動で.gitディレクトリーをダウンロードしてリポジトリーを復元</span></p>
             </div>
@@ -306,7 +324,7 @@
             <div class="tool-item">
               <h4>🔧 git-dumper</h4>
               <div class="code-block">
-                <code>git-dumper https://target.com/.git/ /tmp/repo</code>
+                <code>git-dumper https://target.example/.git/ /tmp/repo</code>
               </div>
               <p><span data-i18n="html.80">部分的に公開された.gitディレクトリーからファイルを復元</span></p>
             </div>
@@ -314,7 +332,7 @@
             <div class="tool-item">
               <h4>🌐 Wayback Machine</h4>
               <div class="code-block">
-                <code>https://web.archive.org/web/*/https://target.com/.git/</code>
+                <code>https://web.archive.org/web/*/https://target.example/.git/</code>
               </div>
               <p><span data-i18n="html.81">過去のスナップショットから削除された.gitファイルを発見</span></p>
             </div>

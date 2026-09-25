@@ -2262,6 +2262,52 @@ h1 {
   }
 }
 
+.calculation {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+  background: var(--white);
+}
+
+.calculation > label, .calculation > input, .calculation > textarea {
+  display: block;
+  width: 100%;
+  margin: 0.75rem 0;
+}
+
+.calculation textarea {
+  min-height: 88px;
+  resize: vertical;
+  font: inherit;
+  color: var(--secondary);
+  background: var(--white);
+}
+
+.calculation .calc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+}
+
+.calc-checkbox input {
+  width: 20px;
+  height: 20px;
+}
+
+.calculation pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--secondary);
+  background: var(--code-bg);
+  padding: 0.75rem;
+}
+
+.calculation dd {
+  overflow-wrap: anywhere;
+}
+
 .invest-layout, .invest-opened, .git-object {
   min-width: 0;
 }
