@@ -37,11 +37,7 @@ document.querySelectorAll('.tab-button').forEach(button => {
 // --- Git構造ビューアー ---
 async function loadGitStructure() {
   try {
-    const response = await fetch('data/sample_git_structure.json');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+    const data = GIT_STRUCTURE;
     
     // 統計情報を生成・表示
     const stats = generateStatistics(data);
@@ -522,54 +518,15 @@ window.addEventListener('load', () => {
 });
 
 // --- Gitオブジェクト復元処理 ---
-const sampleObjects = {
-  // 空のblob（.gitkeepなど）
-  'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391': {
-    type: 'blob',
-    size: 0,
-    content: '',
-    description: '.gitkeepファイルなどの空ファイル'
-  },
-  // Hello Worldファイル
-  '557db03de997c86a4a028e1ebd3a1ceb225be238': {
-    type: 'blob', 
-    size: 12,
-    content: 'Hello World\n',
-    description: 'サンプルテキストファイル'
-  },
-  // 設定ファイルのサンプル
-  '4b825dc642cb6eb9a060e54bf8d69288fbee4904': {
-    type: 'blob',
-    size: 156,
-    content: `# Project Configuration
-version: 1.0.0
-database:
-  host: localhost
-  username: admin
-  password: secret123
-api_keys:
-  stripe: sk_test_abc123def456
-  sendgrid: SG.xyz789`,
-    description: '機密情報を含む設定ファイル（⚠️ 本番環境では危険）'
-  },
-  // Dockerfileのサンプル
-  '89e6c98cbe0ffaa2f1ce9e8c19ca7ee4ad51eb42': {
-    type: 'blob',
-    size: 298,
-    content: `FROM ubuntu:20.04
-RUN apt-get update && apt-get install -y \\
-    python3 \\
-    python3-pip \\
-    nginx
-COPY requirements.txt /app/
-WORKDIR /app
-RUN pip3 install -r requirements.txt
-COPY . /app/
-EXPOSE 8000
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]`,
-    description: 'Dockerコンテナ設定ファイル'
-  }
-};
+const sampleDescriptions = [
+  '.gitkeepファイルなどの空ファイル',
+  'サンプルテキストファイル',
+  '機密情報を含む設定ファイル（⚠️ 本番環境では危険）',
+  'Dockerコンテナ設定ファイル'
+];
+const sampleObjects = Object.fromEntries(SAMPLE_OBJECTS.map((obj, index) => [
+  obj.hash, { ...obj, description: sampleDescriptions[index] }
+]));
 
 document.getElementById('recover-object').addEventListener('click', () => {
   const hash = document.getElementById('object-hash').value.trim();
@@ -590,8 +547,8 @@ document.getElementById('recover-object').addEventListener('click', () => {
 <span style="color: #666;">試しに以下のハッシュを入力してみてください:</span>
 • e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 (空のblob)
 • 557db03de997c86a4a028e1ebd3a1ceb225be238 (Hello Worldを含むblob)
-• 4b825dc642cb6eb9a060e54bf8d69288fbee4904 (treeオブジェクト)
-• 89e6c98cbe0ffaa2f1ce9e8c19ca7ee4ad51eb42 (commitオブジェクト)
+• 3bb8dc0bbcd57a209018a4aa1c6d07db2edc75dd (機密情報を含む設定ファイルのblob)
+• df799688ee42b4d33e495ffa1a78469753c7dde9 (Dockerfileのblob)
 </div>`;
     return;
   }
