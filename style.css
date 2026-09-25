@@ -2376,7 +2376,7 @@ h1 {
   margin: 1rem 0;
 }
 
-#investigation summary {
+#investigation summary, .help-section summary {
   min-height: 44px;
   padding: 0.75rem;
   cursor: pointer;

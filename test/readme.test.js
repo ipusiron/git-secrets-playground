@@ -7,6 +7,8 @@ const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const { SAMPLE_OBJECTS } = require('../js/git-data');
 const { blobHeader, objectPath } = require('../js/git-core');
+const core = require('../js/git-core');
+const scenario = require('../js/scenario-data');
 const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const documents = ['README.md', 'README.en.md'];
@@ -72,9 +74,10 @@ for (const [language, file] of documents.entries()) {
     }
     assert.deepEqual(listed.sort(), filesAt());
   });
-  test(`${file}: exactly three real PNG references with accurate captions`, () => {
+  test(`${file}: exactly five real PNG references with accurate captions`, () => {
     const images = [...source.matchAll(/!\[[^\]]*\]\((assets\/[^)]+\.png)\)/g)].map(m => m[1]);
-    assert.deepEqual(images, ['assets/screenshot.png', 'assets/screenshot2.png', 'assets/screenshot3.png']);
+    assert.deepEqual(images, ['assets/screenshot.png', 'assets/screenshot2.png', 'assets/screenshot3.png',
+      'assets/screenshot4.png', 'assets/screenshot5.png']);
     assert.deepEqual(images.slice().sort(), filesAt('assets').filter(name => name.endsWith('.png')));
     for (const image of images) {
       const png = fs.readFileSync(path.join(root, image));
@@ -85,7 +88,34 @@ for (const [language, file] of documents.entries()) {
       assert.ok(source.includes(png.length.toLocaleString('en-US')));
     }
   });
+  test(`${file}: seven scenario objects match actual decompression and hashes`, async () => {
+    const section = source.split(language ? '### Investigation Data' : '### 履歴の調査のデータ')[1].split('\n### ')[0];
+    const rows = [...section.matchAll(/^\| `([a-f0-9]{40})` \| (blob|tree|commit) \| (\d+) \| `([^`]+)` \|$/gm)];
+    assert.equal(rows.length, 7);
+    assert.deepEqual(rows.map(row => row[1]).sort(), Object.keys(scenario.objects).sort());
+    for (const row of rows) {
+      const obj = await core.openLoose(row[1], core.hexToBytes(scenario.objects[row[1]]));
+      assert.equal(obj.matches, true);
+      assert.equal(row[2], obj.type);
+      assert.equal(Number(row[3]), obj.size);
+      const summary = obj.type === 'commit' ? core.parseCommit(obj.body).message : obj.type === 'tree' ?
+        core.parseTree(obj.body).map(entry => entry.name).join(', ') : new TextDecoder().decode(obj.body).split('\n')[0];
+      assert.equal(row[4], summary);
+      assert.ok(read('CLAUDE.md').includes('| ' + row[1] + ' | ' + row[2] + ' | ' + row[3] + ' | ' + summary + ' |'));
+      assert.ok(read('index.html').includes('<td>' + row[1] + '</td><td>' + row[2] + '</td><td>' + row[3] + '</td>'));
+    }
+    assert.ok(source.includes(scenario.answer.password));
+    assert.ok(source.includes(scenario.answer.apiKey));
+    assert.ok(source.includes(language ? 'six tabs' : '6つのタブ'));
+  });
 }
+
+test('original three screenshots are unchanged from the first release', () => {
+  for (const file of ['assets/screenshot.png', 'assets/screenshot2.png', 'assets/screenshot3.png']) {
+    const old = execFileSync('git', ['show', '5246c0b:' + file], { cwd: root, maxBuffer: 1024 * 1024 });
+    assert.deepEqual(fs.readFileSync(path.join(root, file)), old);
+  }
+});
 
 test('Japanese README metadata preserves HEAD identity and block lists', () => {
   const current = read('README.md').match(/^<!--[\s\S]*?-->/)[0];

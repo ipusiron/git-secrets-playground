@@ -2,6 +2,16 @@
 
 const dictionaries = {
   ja: {
+    "help.invest": "同梱の7オブジェクトを解凍し、SHA-1とファイル名を照合します。HEAD→refs→現在のcommit→parent→以前のtree→config.ymlのblobと進みます。",
+    "help.secret": "以前の設定には演習用の偽物Tr0ub4dor-3とDEMO-KEY-NOT-REAL-7f3a9cが残っています。現在の設定は環境変数の参照です。3段のヒントと答え合わせがあります。",
+    "help.calc": "UTF-8で64 KBまでの中身からSHA-1とzlib圧縮を計算します。逆に、空白を除いて128 KBまでの16進数から解凍できます。末尾の改行追加は既定オンです。",
+    "help.known": "Hello Worldと改行は12バイト、557db03de997c86a4a028e1ebd3a1ceb225be238です。空入力・改行なしのblobはe69de29bb2d1d6434" +
+      "b8b29ae775ad8c2e48c5391です。",
+    "help.api": "crypto.subtle・CompressionStream・DecompressionStreamが必要です。https・file://・localhostの現行ブラウザーを使います。未" +
+      "対応環境では案内を表示し、新しい計算を無効にします。",
+    "help.data": "7オブジェクトの既知解答",
+    "help.dates": "日時は2026-04-01 10:00:00 +0900と2026-04-02 09:30:00 +0900です。ブラウザーのタイムゾーンには依存しません。",
+    "help.tabs": "6つのタブを切り替えて学習できます。READMEには5枚の画像があります。",
     "calc.title": "🧮 本物の計算",
     "calc.encode": "中身からハッシュを作る",
     "calc.text": "中身（UTF-8、64 KBまで）",
@@ -362,7 +372,7 @@ const dictionaries = {
     "html.136": "オブジェクトタイプ、サイズ、内容を表示",
     "html.137": "💡 教育情報:",
     "html.138": "zlibによる圧縮やGitオブジェクトの仕組みを説明",
-    "html.139": "Gitオブジェクトの種類（このツールの復元はblobのみ）",
+    "html.139": "Gitオブジェクトの種類（サンプル4つはblob、本物の計算はtree・commitも対応）",
     "html.140": "ファイルの内容データ",
     "html.141": "ディレクトリーの構造情報",
     "html.142": "コミットのメタデータ",
@@ -445,6 +455,22 @@ const dictionaries = {
     "document.title": "Git Secrets Playground - Git情報漏洩シミュレーター"
   },
   en: {
+    "help.invest": "Decompress the seven bundled objects and compare SHA-1 with filenames. Follow HEAD → refs → cur" +
+      "rent commit → parent → previous tree → config.yml blob.",
+    "help.secret": "The old configuration retains fictional Tr0ub4dor-3 and DEMO-KEY-NOT-REAL-7f3a9c values. The cu" +
+      "rrent configuration uses environment-variable references. Three hints and answer checking are a" +
+      "vailable.",
+    "help.calc": "Calculate SHA-1 and zlib output from up to 64 KB of UTF-8 content, or decompress up to 128 KB o" +
+      "f hexadecimal characters excluding whitespace. Appending a newline is on by default.",
+    "help.known": "Hello World plus a newline is 12 bytes: 557db03de997c86a4a028e1ebd3a1ceb225be238. Empty input w" +
+      "ith no newline gives blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391.",
+    "help.api": "crypto.subtle, CompressionStream, and DecompressionStream are required. Use a modern browser on" +
+      " https, file://, or localhost. Unsupported environments show a notice and disable new calculati" +
+      "ons.",
+    "help.data": "Known answers for seven objects",
+    "help.dates": "Dates are 2026-04-01 10:00:00 +0900 and 2026-04-02 09:30:00 +0900, independent of the browser's" +
+      " timezone.",
+    "help.tabs": "Explore six tabs. The README contains five screenshots.",
     "calc.title": "🧮 Real calculations",
     "calc.encode": "Hash content",
     "calc.text": "Content (UTF-8, up to 64 KB)",
@@ -820,7 +846,7 @@ const dictionaries = {
     "html.136": "View object type, size, and contents.",
     "html.137": "💡 Educational information:",
     "html.138": "Learn about zlib compression and Git objects.",
-    "html.139": "Git object types (this tool recovers sample blobs only)",
+    "html.139": "Git object types (four sample blobs; real calculations also read trees and commits)",
     "html.140": "File contents",
     "html.141": "Directory structure",
     "html.142": "Commit metadata",
