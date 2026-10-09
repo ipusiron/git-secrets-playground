@@ -16,7 +16,7 @@ const headings = [
   ['🌐 デモページ', '🌐 Demo'], ['📸 スクリーンショット', '📸 Screenshots'],
   ['✨ 機能', '✨ Features'], ['📖 使い方', '📖 Usage'],
   ['🔬 仕様と既知解答', '🔬 Specification and Known Answers'],
-  ['🔒 Gitセキュリティベストプラクティス', '🔒 Git Security Best Practices'],
+  ['🎯 ユースケース', '🎯 Use cases'], ['🔒 Gitセキュリティベストプラクティス', '🔒 Git Security Best Practices'],
   ['📚 学べること', '📚 What You Can Learn'], ['🔗 関連リソース', '🔗 Related Resources'],
   ['🔒 このツールのセキュリティ', '🔒 Security of This Tool'], ['⚠️ 免責事項', '⚠️ Disclaimer'],
   ['🧪 テスト', '🧪 Tests'], ['📁 ディレクトリー構造', '📁 Directory Structure'],
@@ -130,4 +130,21 @@ test('Japanese README metadata preserves HEAD identity and block lists', () => {
     assert.match(current, new RegExp(`^${key}:\\r?\\n  - \\S`, 'm'));
   }
   assert.equal(fs.readdirSync(path.join(root, 'test')).filter(name => name.endsWith('.test.js')).length, 6);
+});
+
+test('ユースケースの「このツールならではの使い方」を git-core.js で再計算（日英）', async () => {
+  const C = require('../js/git-core.js');
+  const [ja, en] = documents.map((f) => fs.readFileSync(path.join(root, f), 'utf8'));
+  assert.equal(C.blobHeader(6), 'blob 6\u0000');
+  const h1 = await C.hashObject('hello\n', 'blob');
+  assert.equal(h1, 'e8db395cd636e6c7b612354eae64c9dbf7705299');
+  assert.equal(C.objectPath(h1), '.git/objects/e8/db395cd636e6c7b612354eae64c9dbf7705299');
+  const h2 = await C.hashObject('hellp\n', 'blob');
+  assert.equal(h2, '1f143734d118ba26028f6fb1250e5b34dc1d975e');
+  assert.notEqual(h1, h2);
+  assert.equal(await C.hashObject('hello\n', 'blob'), h1);
+  for (const md of [ja, en]) {
+    assert.ok(md.includes('e8db395cd636e6c7b612354eae64c9dbf7705299'));
+    assert.ok(md.includes('1f143734') && md.includes('.git/objects/e8/'));
+  }
 });
