@@ -212,6 +212,20 @@ Limits are 64 KB of UTF-8 content and 128 KB of hexadecimal characters after whi
 
 ---
 
+## 🎯 Use cases
+
+### Ways of using this tool in particular
+
+- Confirming that a git hash is the SHA-1 of "type length + null byte + content" (content-addressing classes): git uses as the object ID the SHA-1 of the whole of `blob 6` (type and length), a null byte and then the content. The blob ID of `hello\n` (6 bytes) is `e8db395cd636e6c7b612354eae64c9dbf7705299`, matching `git hash-object`. You can confirm, with a real hash, the content-addressing scheme where the ID is decided by the content
+- Confirming that the first two hex of the hash become a directory name (storage-design classes): an object is stored with the first two hex of the ID as the directory and the remaining 38 as the file name. `e8db395...` goes to `.git/objects/e8/db395cd636e6c7b612354eae64c9dbf7705299`. You can confirm the scheme of sharding a flat store by the start of the ID
+- Confirming that the same content gives the same ID and one changed character gives a completely different one (avalanche and history classes): the ID of `hello\n` is `e8db395...` and the ID of the one-character-changed `hellp\n` is `1f143734...`, completely different, while the same content always gives the same ID. A secret committed once stays in history under the same ID, so removing it needs rewriting history, which you can confirm by how the hash changes
+
+### General uses
+
+- Learn the internals of git (the hashes of blobs, trees and commits) in class or self-study
+- Use it as material to explain why a committed secret stays in history
+- Confirm the properties of content-addressed storage and SHA-1 on real objects
+
 ## 🔒 Git Security Best Practices
 
 ### 🛡️ Prevention
