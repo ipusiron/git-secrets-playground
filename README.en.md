@@ -44,8 +44,6 @@ What leaks when a `.git` directory is publicly accessible?
 
 *English calculation of Hello World with a newline: hash 557db03d…, header, and zlib-compressed output (1280×1000, 41,780 bytes).*
 
-The first three images preserve the first release. The two new images show the second release.
-
 ---
 
 ## ✨ Features
