@@ -60,15 +60,15 @@ English: [README.en.md](README.en.md)
 
 ![構造ビューアー](assets/screenshot.png)
 
-*日本語の統計とツリー先頭のリスク色分け（1280×1000、114,140バイト）。*
+*日本語の統計とツリー先頭のリスク色分け（1280×1000、116,150バイト）。*
 
 ![機密設定ファイルの復元](assets/screenshot2.png)
 
-*日本語の設定ファイル復元。ハッシュ3bb8dc0b…・169バイト・中身を表示（1280×1000、92,900バイト）。*
+*日本語の設定ファイル復元。ハッシュ3bb8dc0b…・169バイト・中身から計算したハッシュとの一致・中身を表示（1280×1000、91,442バイト）。*
 
-![英語のリーク検査結果](assets/screenshot3.png)
+![リーク検査結果](assets/screenshot3.png)
 
-*英語でスキップ完了したリーク検査の結果（1280×1000、234,199バイト）。*
+*日本語でスキップ完了したリーク検査の結果（1280×1000、238,666バイト）。*
 
 ![履歴から削除済み設定を調査](assets/screenshot4.png)
 
@@ -76,7 +76,7 @@ English: [README.en.md](README.en.md)
 
 ![本物の計算](assets/screenshot5.png)
 
-*英語の実計算。Hello Worldと改行のハッシュ557db03d…・見出し・zlib圧縮結果（1280×1000、41,780バイト）。*
+*日本語の実計算。Hello Worldと改行のハッシュ557db03d…・見出し・zlib圧縮結果（1280×1000、52,174バイト）。*
 
 ---
 
@@ -419,7 +419,7 @@ npm test
 | html.test.js | CSP・ARIA・ラベル・外部リンク・禁止API |
 | contrast.test.js | 指定色の文字コントラスト4.5:1以上 |
 | format.test.js | 行数の下限と行の長さ |
-| readme.test.js | 日英の4サンプルと7オブジェクト・YAML・ツリー・見出し・5画像 |
+| readme.test.js | 日英の4サンプルと7オブジェクト・YAML・ツリー・見出し・日英各5画像 |
 
 サンプルの中身が変わっていないことは、元のコミット`bbecd38`のソースとも比較します。浅いクローンの場合は、その履歴を取得してから実行してください。
 
@@ -441,12 +441,18 @@ git-secrets-playground/           # プロジェクトルート
 ├── package.json                  # 依存なしのnpm test（node --test）
 ├── index.html                    # 6タブ・ヘルプ・meta CSP
 ├── style.css                     # 配色変数・レスポンシブ・アニメーション
-├── assets/                       # README用の画像
+├── assets/                       # README用の画像（日本語の画面）
+│   ├── en/                       # 英語版README用の画像（英語の画面。名前と場面は日本語版と同じ）
+│   │   ├── screenshot.png        # 構造ビューアーの統計とリスクの色分け
+│   │   ├── screenshot2.png       # 機密設定ファイルのサンプル復元
+│   │   ├── screenshot3.png       # リーク検査の結果
+│   │   ├── screenshot4.png       # 履歴から削除済み設定を開きハッシュ一致を確認
+│   │   └── screenshot5.png       # Hello Worldの実計算とzlib圧縮結果
 │   ├── screenshot.png            # 構造ビューアーの統計とリスクの色分け
 │   ├── screenshot2.png           # 機密設定ファイルのサンプル復元
-│   ├── screenshot3.png           # 英語のリーク検査の結果
+│   ├── screenshot3.png           # リーク検査の結果
 │   ├── screenshot4.png           # 履歴から削除済み設定を開きハッシュ一致を確認
-│   └── screenshot5.png           # 英語のHello Worldの実計算とzlib圧縮結果
+│   └── screenshot5.png           # Hello Worldの実計算とzlib圧縮結果
 ├── js/                           # file://でも動くclassic script
 │   ├── git-core.js               # SHA-1・zlib・オブジェクト解析・集計・URL
 │   ├── scenario-data.js          # 本物のGitから採取した履歴調査のデータ

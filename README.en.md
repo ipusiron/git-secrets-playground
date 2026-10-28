@@ -24,25 +24,25 @@ What leaks when a `.git` directory is publicly accessible?
 
 ## 📸 Screenshots
 
-![Structure Viewer](assets/screenshot.png)
+![Structure Viewer](assets/en/screenshot.png)
 
-*Japanese structure statistics and risk-colored tree entries (1280×1000, 114,140 bytes).*
+*Structure statistics and risk-colored tree entries (1280×1000, 118,266 bytes).*
 
-![Sensitive configuration recovery](assets/screenshot2.png)
+![Sensitive configuration recovery](assets/en/screenshot2.png)
 
-*Japanese configuration recovery showing hash 3bb8dc0b…, size 169 bytes, and content (1280×1000, 92,900 bytes).*
+*Configuration recovery showing hash 3bb8dc0b…, size 169 bytes, a match with the hash calculated from the content, and the content (1280×1000, 101,626 bytes).*
 
-![Leak scan results in English](assets/screenshot3.png)
+![Leak scan results](assets/en/screenshot3.png)
 
-*English leak scan results after skipping to completion (1280×1000, 234,199 bytes).*
+*Leak scan results after skipping to completion (1280×1000, 234,320 bytes).*
 
-![Investigating deleted configuration](assets/screenshot4.png)
+![Investigating deleted configuration](assets/en/screenshot4.png)
 
-*Japanese history investigation: Tr0ub4dor-3 in the previous config.yml and a matching filename hash (1280×1000, 123,392 bytes).*
+*History investigation: Tr0ub4dor-3 in the previous config.yml and a matching filename hash (1280×1000, 115,364 bytes).*
 
-![Real calculations](assets/screenshot5.png)
+![Real calculations](assets/en/screenshot5.png)
 
-*English calculation of Hello World with a newline: hash 557db03d…, header, and zlib-compressed output (1280×1000, 41,780 bytes).*
+*Calculation of Hello World with a newline: hash 557db03d…, header, and zlib-compressed output (1280×1000, 41,780 bytes).*
 
 ---
 
@@ -390,7 +390,7 @@ No package installation is required. GitHub Actions runs the suite on Node 22 fo
 | html.test.js | CSP, ARIA, labels, external links, and forbidden APIs |
 | contrast.test.js | Text contrast of at least 4.5:1 for specified colors |
 | format.test.js | Minimum line counts and maximum line lengths |
-| readme.test.js | Four samples and seven objects in both languages, YAML, tree, headings, and five images |
+| readme.test.js | Four samples and seven objects in both languages, YAML, tree, headings, and five images per language |
 
 Sample contents are also compared with the source at the original commit `bbecd38`. Fetch that history before testing a shallow clone.
 
@@ -412,12 +412,18 @@ git-secrets-playground/           # Project root
 ├── package.json                  # Dependency-free npm test (node --test)
 ├── index.html                    # Six tabs, help, and meta CSP
 ├── style.css                     # Color variables, responsive layout, and animation
-├── assets/                       # README images
+├── assets/                       # README images (Japanese interface)
+│   ├── en/                       # English README images (English interface, same names and scenes)
+│   │   ├── screenshot.png        # Structure statistics and risk colors
+│   │   ├── screenshot2.png       # Sensitive configuration sample recovery
+│   │   ├── screenshot3.png       # Leak scan results
+│   │   ├── screenshot4.png       # Deleted configuration and matching filename hash
+│   │   └── screenshot5.png       # Hello World calculation and zlib output
 │   ├── screenshot.png            # Structure statistics and risk colors
 │   ├── screenshot2.png           # Sensitive configuration sample recovery
-│   ├── screenshot3.png           # Leak scan results in English
+│   ├── screenshot3.png           # Leak scan results
 │   ├── screenshot4.png           # Deleted configuration and matching filename hash
-│   └── screenshot5.png           # English Hello World calculation and zlib output
+│   └── screenshot5.png           # Hello World calculation and zlib output
 ├── js/                           # Classic scripts compatible with file://
 │   ├── git-core.js               # SHA-1, zlib, object parsing, statistics, and URLs
 │   ├── scenario-data.js          # Investigation data captured from real Git

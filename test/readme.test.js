@@ -75,10 +75,13 @@ for (const [language, file] of documents.entries()) {
     assert.deepEqual(listed.sort(), filesAt());
   });
   test(`${file}: exactly five real PNG references with accurate captions`, () => {
+    // 日本語版は日本語の画面（assets/）、英語版は同じ場面の英語の画面（assets/en/）を指す
+    const dir = language ? 'assets/en/' : 'assets/';
     const images = [...source.matchAll(/!\[[^\]]*\]\((assets\/[^)]+\.png)\)/g)].map(m => m[1]);
-    assert.deepEqual(images, ['assets/screenshot.png', 'assets/screenshot2.png', 'assets/screenshot3.png',
-      'assets/screenshot4.png', 'assets/screenshot5.png']);
-    assert.deepEqual(images.slice().sort(), filesAt('assets').filter(name => name.endsWith('.png')));
+    assert.deepEqual(images, ['screenshot.png', 'screenshot2.png', 'screenshot3.png',
+      'screenshot4.png', 'screenshot5.png'].map(name => dir + name));
+    const pngs = fs.readdirSync(path.join(root, dir)).filter(name => name.endsWith('.png')).map(name => dir + name);
+    assert.deepEqual(images.slice().sort(), pngs.sort());
     for (const image of images) {
       const png = fs.readFileSync(path.join(root, image));
       assert.equal(png.subarray(1, 4).toString(), 'PNG');
@@ -109,13 +112,6 @@ for (const [language, file] of documents.entries()) {
     assert.ok(source.includes(language ? 'six tabs' : '6つのタブ'));
   });
 }
-
-test('original three screenshots are unchanged from the first release', () => {
-  for (const file of ['assets/screenshot.png', 'assets/screenshot2.png', 'assets/screenshot3.png']) {
-    const old = execFileSync('git', ['show', '5246c0b:' + file], { cwd: root, maxBuffer: 1024 * 1024 });
-    assert.deepEqual(fs.readFileSync(path.join(root, file)), old);
-  }
-});
 
 test('Japanese README metadata preserves HEAD identity and block lists', () => {
   const current = read('README.md').match(/^<!--[\s\S]*?-->/)[0];
