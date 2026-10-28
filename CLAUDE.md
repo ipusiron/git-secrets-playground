@@ -125,6 +125,7 @@ Six Node test files:
 - readme.test.js: known-answer tables, YAML metadata, complete commented tree, matching headings, image references
 
 Keep README.md, README.en.md, this guide, help, UI, and tests consistent. Both READMEs retain
-matching 15 sections and reference five screenshots. Preserve the original three images;
-only screenshot4.png (Japanese deleted config) and screenshot5.png (English real calculation)
-are new. Preserve Japanese README metadata structure and existing source readability.
+matching 15 sections and reference five screenshots each: README.md uses Japanese screens in
+assets/, README.en.md uses English screens of the same scenes in assets/en/ (same file names).
+Retake them with business/research/try100_audit/impl/shots/day031_shots3.py in ipusiron-work
+when the screen changes, and update the byte counts in the captions. Preserve Japanese README metadata structure and existing source readability.
